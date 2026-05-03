@@ -1,0 +1,97 @@
+@import "tailwindcss";
+
+@theme {
+  --font-instrument: var(--font-instrument);
+  --font-syne: var(--font-syne);
+  --font-syne-mono: var(--font-syne-mono);
+  --font-satisfy: var(--font-satisfy);
+
+  --color-maroon: #5C1414;
+  --color-dark-maroon: #3A0A0A;
+  --color-gold: #C4973A;
+  --color-cream: #F4EDE0;
+  --color-warm-white: #FDFAF5;
+  --color-ink: #1A0808;
+  --color-muted: #7A4040;
+  --color-chalk: #EDE0CE;
+}
+
+@layer base {
+  :root {
+    --bg-color: #F4EDE0;
+    --bg-warm: #FDFAF5;
+    --text-primary: #1A0808;
+    --text-muted: #5C1414CC;
+    --graph-line: rgba(92, 20, 20, 0.03);
+  }
+
+  .dark {
+    --bg-color: #130606;
+    --bg-warm: #180808;
+    --text-primary: #F4EDE0;
+    --text-muted: #9A6060;
+    --color-warm-white: #1E0808;
+    --graph-line: rgba(244, 237, 224, 0.02);
+  }
+
+  body {
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    font-family: var(--font-syne);
+    overflow-x: hidden;
+  }
+}
+
+@layer utilities {
+  .graph-paper {
+    background-image: 
+      repeating-linear-gradient(0deg, var(--graph-line) 0px, var(--graph-line) 1px, transparent 1px, transparent 20px),
+      repeating-linear-gradient(90deg, var(--graph-line) 0px, var(--graph-line) 1px, transparent 1px, transparent 20px);
+  }
+
+  .clip-diagonal {
+    clip-path: polygon(0 85%, 100% 95%, 100% 100%, 0% 100%);
+  }
+
+  /* Scroll Reveal Classes */
+  .sr-hidden {
+    opacity: 0;
+  }
+  .sr-up {
+    transform: translateY(32px);
+  }
+  .sr-left {
+    transform: translateX(-32px);
+  }
+  .sr-right {
+    transform: translateX(32px);
+  }
+  .sr-fade {
+    transform: none;
+  }
+  
+  .visible.sr-up, .visible.sr-left, .visible.sr-right, .visible.sr-fade {
+    opacity: 1;
+    transform: translate(0, 0);
+    transition: all 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  
+  .delay-1 { transition-delay: 0.1s !important; }
+  .delay-2 { transition-delay: 0.2s !important; }
+  .delay-3 { transition-delay: 0.3s !important; }
+  .delay-4 { transition-delay: 0.4s !important; }
+  .delay-5 { transition-delay: 0.5s !important; }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Hide scrollbar for carousel */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
