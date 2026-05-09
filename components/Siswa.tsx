@@ -137,8 +137,8 @@ export default function Siswa() {
                           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-1 bg-[#C4973A] rounded-full"></div>
                        </div>
                        
-                       <p className="font-instrument italic text-[0.9rem] md:text-[1rem] text-[#F4EDE0]/80 leading-[1.5] flex-1">
-                         Tercatat pada database akademik kelas XI IPA 5 periode ajaran ini.
+                       <p className="font-instrument italic text-[0.85rem] md:text-[0.95rem] text-[#F4EDE0]/90 leading-[1.4] flex-1">
+                         &quot;{s.quote || 'Tercatat pada database akademik kelas XI IPA 5 periode ajaran ini.'}&quot;
                        </p>
 
                        <span className="font-syne-mono text-[0.6rem] md:text-[0.65rem] text-[#C4973A]/50 mt-auto tracking-widest text-center">ARSIP SISWA • EPSILON</span>

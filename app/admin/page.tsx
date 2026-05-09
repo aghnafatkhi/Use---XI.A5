@@ -114,18 +114,37 @@ export default function AdminPage() {
   const addGallery = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
-    const newItem = {
-      title: fd.get('title') as string,
-      category: fd.get('category') as string,
-      bg: fd.get('bg') as string,
-      createdAt: Date.now()
-    };
+    const bg = fd.get('bg') as string;
+    
+    if (!bg) {
+      alert('Mohon pilih gambar atau masukkan URL/Gradient');
+      return;
+    }
+
     try {
+      const newItem = {
+        title: fd.get('title') as string,
+        category: fd.get('category') as string,
+        bg: bg,
+        createdAt: Date.now()
+      };
       await addDoc(collection(db, 'gallery'), newItem);
       e.currentTarget.reset();
+      setPreview(null);
     } catch (err) {
       handleFirestoreError(err, OperationType.CREATE, 'gallery');
     }
+  };
+
+  const [preview, setPreview] = useState<string | null>(null);
+  const handleFile = (file: File) => {
+    if (file.size > 800000) {
+      alert('File terlalu besar (Maks 800KB untuk optimalitas database)');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => setPreview(e.target?.result as string);
+    reader.readAsDataURL(file);
   };
 
   const deleteDocItem = async (col: string, id: string) => {
@@ -143,6 +162,7 @@ export default function AdminPage() {
       absen: fd.get('absen') as string,
       name: fd.get('name') as string,
       role: fd.get('role') as string,
+      quote: fd.get('quote') as string,
     };
     try {
       await addDoc(collection(db, 'students'), newItem);
@@ -211,11 +231,41 @@ export default function AdminPage() {
                 <button onClick={seedGallery} className="text-xs border border-[#C4973A] px-3 py-1 rounded text-[#C4973A] hover:bg-[#C4973A] hover:text-black transition-all">Impor Data Awal</button>
               )}
             </div>
-            <form onSubmit={addGallery} className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8 bg-[#3A0A0A] p-6 rounded-lg border border-[#C4973A33]">
-              <input required name="title" placeholder="Title (e.g. Class Meeting)" className="bg-[#180808] p-2 rounded text-[#F4EDE0] text-sm border border-transparent focus:border-[#C4973A] outline-none" />
-              <input required name="category" placeholder="Category (e.g. Momen)" className="bg-[#180808] p-2 rounded text-[#F4EDE0] text-sm border border-transparent focus:border-[#C4973A] outline-none" />
-              <input required name="bg" placeholder="Image URL / CSS Gradient" className="bg-[#180808] p-2 rounded text-[#F4EDE0] text-sm border border-transparent focus:border-[#C4973A] outline-none" />
-              <button type="submit" className="bg-[#C4973A] text-black font-bold uppercase tracking-wider rounded text-sm hover:bg-[#F4EDE0] transition-colors">Tambahkan</button>
+            <form onSubmit={addGallery} className="flex flex-col gap-6 mb-8 bg-[#3A0A0A] p-6 rounded-lg border border-[#C4973A33]">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div 
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer.files[0]; if(f) handleFile(f); }}
+                    className="border-2 border-dashed border-[#C4973A4D] rounded-lg h-48 flex flex-col items-center justify-center relative overflow-hidden group hover:border-[#C4973A] transition-colors cursor-pointer"
+                    onClick={() => document.getElementById('file-input')?.click()}
+                  >
+                    {preview ? (
+                      <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${preview})` }}></div>
+                    ) : (
+                      <>
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[#C4973A] mb-2 opacity-50 group-hover:opacity-100 transition-opacity">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                          <polyline points="17 8 12 3 7 8"></polyline>
+                          <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <span className="text-xs font-syne uppercase tracking-widest text-[#C4973A80]">Drag & Drop High Quality Image</span>
+                        <span className="text-[10px] text-[#F4EDE04D] mt-1">Atau klik untuk memilih file</span>
+                      </>
+                    )}
+                    <input id="file-input" type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if(f) handleFile(f); }} />
+                    <input type="hidden" name="bg" value={preview || ''} />
+                  </div>
+                </div>
+                <div className="flex flex-col space-y-4">
+                  <input required name="title" placeholder="Judul Foto (e.g. Momen KBM)" className="bg-[#180808] p-3 rounded text-[#F4EDE0] text-sm border border-transparent focus:border-[#C4973A] outline-none" />
+                  <input required name="category" placeholder="Kategori (e.g. kegiatan, momen, foto-kelas)" className="bg-[#180808] p-3 rounded text-[#F4EDE0] text-sm border border-transparent focus:border-[#C4973A] outline-none" />
+                  <div className="pt-2">
+                    <p className="text-[10px] text-[#F4EDE0]/50 mb-3 uppercase tracking-tighter">* Gunakan drag & drop di kiri untuk upload gambar, atau isi manual input hidden jika perlu.</p>
+                    <button type="submit" className="w-full bg-[#C4973A] text-black font-bold uppercase tracking-widest py-3 rounded text-sm hover:bg-[#F4EDE0] transition-all">Publikasikan Ke Galeri</button>
+                  </div>
+                </div>
+              </div>
             </form>
 
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -243,10 +293,11 @@ export default function AdminPage() {
                 <button onClick={seedStudents} className="text-xs border border-[#C4973A] px-3 py-1 rounded text-[#C4973A] hover:bg-[#C4973A] hover:text-black transition-all">Impor Data Awal</button>
               )}
             </div>
-            <form onSubmit={addStudent} className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8 bg-[#3A0A0A] p-6 rounded-lg border border-[#C4973A33]">
+            <form onSubmit={addStudent} className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8 bg-[#3A0A0A] p-6 rounded-lg border border-[#C4973A33]">
               <input required name="absen" placeholder="No Absen (e.g. 01)" className="bg-[#180808] p-2 rounded text-[#F4EDE0] text-sm border border-transparent focus:border-[#C4973A] outline-none" />
               <input required name="name" placeholder="Nama Lengkap" className="bg-[#180808] p-2 rounded text-[#F4EDE0] text-sm border border-transparent focus:border-[#C4973A] outline-none" />
               <input name="role" placeholder="Jabatan (Opsional)" className="bg-[#180808] p-2 rounded text-[#F4EDE0] text-sm border border-transparent focus:border-[#C4973A] outline-none" />
+              <input name="quote" placeholder="Kutipan/Quote" className="bg-[#180808] p-2 rounded text-[#F4EDE0] text-sm border border-transparent focus:border-[#C4973A] outline-none" />
               <button type="submit" className="bg-[#C4973A] text-black font-bold uppercase tracking-wider rounded text-sm hover:bg-[#F4EDE0] transition-colors">Tambahkan</button>
             </form>
 
@@ -257,6 +308,7 @@ export default function AdminPage() {
                     <th className="p-3">Absen</th>
                     <th className="p-3">Nama Lengkap</th>
                     <th className="p-3">Jabatan</th>
+                    <th className="p-3">Quote</th>
                     <th className="p-3 text-right">Aksi</th>
                   </tr>
                 </thead>
@@ -266,6 +318,7 @@ export default function AdminPage() {
                       <td className="p-3 text-[#C4973A] font-syne-mono">{s.absen}</td>
                       <td className="p-3">{s.name}</td>
                       <td className="p-3">{s.role || '-'}</td>
+                      <td className="p-3 italic text-xs text-[#F4EDE0]/60 max-w-[200px] truncate">{s.quote || '-'}</td>
                       <td className="p-3 text-right">
                         <button onClick={() => deleteDocItem('students', s.id)} className="text-red-400 hover:text-red-300 uppercase text-xs tracking-wider">Hapus</button>
                       </td>

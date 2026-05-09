@@ -19,7 +19,8 @@
       "properties": {
         "absen": { "type": "string" },
         "name": { "type": "string" },
-        "role": { "type": "string" }
+        "role": { "type": "string" },
+        "quote": { "type": "string" }
       },
       "required": ["absen", "name"]
     },

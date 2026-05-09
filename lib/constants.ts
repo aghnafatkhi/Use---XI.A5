@@ -14,14 +14,14 @@ export const staticGalleryData = [
 ];
 
 export const staticStudents = [
-  { absen: '01', name: 'Abyan Dzaky Pratama', role: 'Ketua Kelas' },
-  { absen: '02', name: 'Adinda Putri Rahayu', role: 'Wakil Ketua' },
-  { absen: '03', name: 'Aghna Nur Fadhilah', role: 'Sekretaris 1' },
-  { absen: '04', name: 'Ahmad Fauzi', role: '' },
-  { absen: '05', name: 'Aisha Nuraini', role: 'Bendahara 1' },
-  { absen: '06', name: 'Alya Salsabila', role: '' },
-  { absen: '07', name: 'Ananda Rizki Putra', role: '' },
-  { absen: '08', name: 'Annisa Farah Diba', role: 'Sekretaris 2' },
+  { absen: '01', name: 'Abyan Dzaky Pratama', role: 'Ketua Kelas', quote: 'Memimpin dengan teladan, melayani dengan hati.' },
+  { absen: '02', name: 'Adinda Putri Rahayu', role: 'Wakil Ketua', quote: 'Kesuksesan adalah hasil dari kerja keras dan doa.' },
+  { absen: '03', name: 'Aghna Nur Fadhilah', role: 'Sekretaris 1', quote: 'Setiap goresan tinta adalah jejak sejarah masa depan.' },
+  { absen: '04', name: 'Ahmad Fauzi', role: '', quote: 'Diam itu emas, tapi ilmu adalah cahaya.' },
+  { absen: '05', name: 'Aisha Nuraini', role: 'Bendahara 1', quote: 'Ketelitian adalah kunci dari keteraturan.' },
+  { absen: '06', name: 'Alya Salsabila', role: '', quote: 'Jadilah dirimu sendiri, versi terbaik setiap hari.' },
+  { absen: '07', name: 'Ananda Rizki Putra', role: '', quote: 'Masa depan milik mereka yang percaya pada mimpi.' },
+  { absen: '08', name: 'Annisa Farah Diba', role: 'Sekretaris 2', quote: 'Kerapihan mencerminkan kebersihan pikiran.' },
   { absen: '09', name: 'Arif Rahman Hakim', role: '' },
   { absen: '10', name: 'Aulia Rahma Sari', role: '' },
   { absen: '11', name: 'Bagas Dwi Santoso', role: '' },
