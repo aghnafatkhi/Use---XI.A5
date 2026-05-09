@@ -35,7 +35,9 @@ export const metadata: Metadata = {
 export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
     <html lang="en" className={`${instrumentSerif.variable} ${syne.variable} ${syneMono.variable} ${satisfy.variable}`}>
-      <body className="antialiased font-syne" suppressHydrationWarning>{children}</body>
+      <body className="antialiased font-syne" suppressHydrationWarning>
+        {children}
+      </body>
     </html>
   );
 }

@@ -25,15 +25,6 @@
     --graph-line: rgba(92, 20, 20, 0.03);
   }
 
-  .dark {
-    --bg-color: #130606;
-    --bg-warm: #180808;
-    --text-primary: #F4EDE0;
-    --text-muted: #9A6060;
-    --color-warm-white: #1E0808;
-    --graph-line: rgba(244, 237, 224, 0.02);
-  }
-
   body {
     background-color: var(--bg-color);
     color: var(--text-primary);

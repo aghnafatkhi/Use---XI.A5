@@ -41,7 +41,7 @@ export default function Footer() {
               Navigasi
             </span>
             <div className="flex flex-col space-y-1">
-              {['Beranda', 'Tentang', 'Galeri', 'Siswa', 'Agenda', 'Kenangan'].map(item => (
+              {['Beranda', 'Tentang', 'Galeri', 'Siswa', 'Kenangan'].map(item => (
                 <a 
                   key={item} 
                   href={`#${item.toLowerCase()}`}
@@ -74,8 +74,8 @@ export default function Footer() {
       <div className="w-full h-[1px] bg-[#F4EDE0]/5"></div>
 
       <div className="py-6 px-6 text-center flex flex-col space-y-1">
-         <span className="font-syne text-[0.75rem] text-[#F4EDE0]/30">© 2025 Epsilonscience — All memories reserved.</span>
-         <span className="font-syne text-[0.75rem] text-[#F4EDE0]/30">Dibuat dengan bangga oleh warga Xi IPA 5.</span>
+         <span className="font-syne text-[0.75rem] text-[#F4EDE0]/30">© 2025-2026 Epsilonscience — Hak Cipta Dilindungi Undang-Undang.</span>
+         <span className="font-syne text-[0.75rem] text-[#F4EDE0]/30">Repositori Dokumentasi Resmi SMAN 1 Cileungsi.</span>
       </div>
 
       {/* BACK TO TOP */}

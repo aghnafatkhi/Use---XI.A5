@@ -9,7 +9,6 @@ import Manifesto from '../components/Manifesto';
 import Galeri from '../components/Galeri';
 import Siswa from '../components/Siswa';
 import Struktur from '../components/Struktur';
-import Linimasa from '../components/Linimasa';
 import Kenangan from '../components/Kenangan';
 import Footer from '../components/Footer';
 
@@ -32,7 +31,6 @@ export default function Page() {
         <Galeri />
         <Siswa />
         <Struktur />
-        <Linimasa />
         <Kenangan />
       </main>
       <Footer />

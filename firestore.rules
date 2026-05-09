@@ -1,0 +1,82 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+    
+    function isSignedIn() { return request.auth != null; }
+    function AdminCheck() { return isSignedIn() && (request.auth.token.email == 'aghna1011@gmail.com' || exists(/databases/$(database)/documents/admins/$(request.auth.uid))); }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+
+    function isValidGalleryItem(data) {
+      return data.keys().hasAll(['title', 'category', 'bg', 'createdAt']) && data.keys().size() == 4
+        && data.title is string && data.title.size() <= 100
+        && data.category is string && data.category.size() <= 50
+        && data.bg is string && data.bg.size() <= 1000
+        && data.createdAt is number;
+    }
+    
+    match /gallery/{docId} {
+      allow read: if true;
+      allow create: if AdminCheck() && isValidId(docId) && isValidGalleryItem(incoming());
+      allow update: if AdminCheck() && isValidId(docId) && isValidGalleryItem(incoming());
+      allow delete: if AdminCheck() && isValidId(docId);
+    }
+    
+    function isValidStudent(data) {
+      return data.keys().hasAll(['absen', 'name']) && data.keys().size() >= 2 && data.keys().size() <= 3
+        && data.absen is string && data.absen.size() <= 10
+        && data.name is string && data.name.size() <= 100
+        && (data.keys().hasAll(['role']) ? (data.role is string && data.role.size() <= 100) : true);
+    }
+    
+    match /students/{docId} {
+      allow read: if true;
+      allow create: if AdminCheck() && isValidId(docId) && isValidStudent(incoming());
+      allow update: if AdminCheck() && isValidId(docId) && isValidStudent(incoming());
+      allow delete: if AdminCheck() && isValidId(docId);
+    }
+
+    function isValidEvent(data) {
+      return data.keys().hasAll(['date', 'title', 'desc', 'order']) && data.keys().size() == 4
+        && data.date is string && data.date.size() <= 50
+        && data.title is string && data.title.size() <= 100
+        && data.desc is string && data.desc.size() <= 500
+        && data.order is number;
+    }
+    
+    match /events/{docId} {
+      allow read: if true;
+      allow create: if AdminCheck() && isValidId(docId) && isValidEvent(incoming());
+      allow update: if AdminCheck() && isValidId(docId) && isValidEvent(incoming());
+      allow delete: if AdminCheck() && isValidId(docId);
+    }
+
+    function isValidMemory(data) {
+      return data.keys().hasAll(['title', 'date', 'desc', 'rotate', 'bg', 'order']) && data.keys().size() == 6
+        && data.title is string && data.title.size() <= 100
+        && data.date is string && data.date.size() <= 50
+        && data.desc is string && data.desc.size() <= 500
+        && data.rotate is string && data.rotate.size() <= 20
+        && data.bg is string && data.bg.size() <= 1000
+        && data.order is number;
+    }
+    
+    match /memories/{docId} {
+      allow read: if true;
+      allow create: if AdminCheck() && isValidId(docId) && isValidMemory(incoming());
+      allow update: if AdminCheck() && isValidId(docId) && isValidMemory(incoming());
+      allow delete: if AdminCheck() && isValidId(docId);
+    }
+
+    match /admins/{docId} {
+      allow read: if AdminCheck();
+      allow create: if false; 
+      allow update: if false;
+      allow delete: if false;
+    }
+  }
+}

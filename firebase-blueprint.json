@@ -1,0 +1,84 @@
+{
+  "entities": {
+    "GalleryItem": {
+      "title": "GalleryItem",
+      "description": "An image or event in the gallery.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "category": { "type": "string" },
+        "bg": { "type": "string", "description": "CSS background string (gradient) or image URL" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["title", "category", "bg", "createdAt"]
+    },
+    "Student": {
+      "title": "Student",
+      "description": "A student in the class.",
+      "type": "object",
+      "properties": {
+        "absen": { "type": "string" },
+        "name": { "type": "string" },
+        "role": { "type": "string" }
+      },
+      "required": ["absen", "name"]
+    },
+    "Event": {
+      "title": "Event",
+      "description": "An event in the timeline.",
+      "type": "object",
+      "properties": {
+        "date": { "type": "string" },
+        "title": { "type": "string" },
+        "desc": { "type": "string" },
+        "order": { "type": "number", "description": "Used to sort events" }
+      },
+      "required": ["date", "title", "desc", "order"]
+    },
+    "Memory": {
+      "title": "Memory",
+      "description": "A polaroid memory item.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "date": { "type": "string" },
+        "desc": { "type": "string" },
+        "rotate": { "type": "string" },
+        "bg": { "type": "string" },
+        "order": { "type": "number" }
+      },
+      "required": ["title", "date", "desc", "rotate", "bg", "order"]
+    },
+    "Admin": {
+      "title": "Admin",
+      "description": "Admin access list.",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string" }
+      },
+      "required": ["email"]
+    }
+  },
+  "firestore": {
+    "gallery": {
+      "schema": { "$ref": "#/entities/GalleryItem" },
+      "description": "Contains gallery images"
+    },
+    "students": {
+      "schema": { "$ref": "#/entities/Student" },
+      "description": "Contains class roster"
+    },
+    "events": {
+      "schema": { "$ref": "#/entities/Event" },
+      "description": "Contains timeline events"
+    },
+    "memories": {
+      "schema": { "$ref": "#/entities/Memory" },
+      "description": "Contains polaroid memories"
+    },
+    "admins": {
+      "schema": { "$ref": "#/entities/Admin" },
+      "description": "Contains admin users mapping by UID"
+    }
+  }
+}
