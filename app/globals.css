@@ -46,7 +46,7 @@
 
   /* Scroll Reveal Classes */
   .sr-hidden {
-    opacity: 0;
+    opacity: 0 !important;
   }
   .sr-up {
     transform: translateY(32px);
@@ -61,10 +61,14 @@
     transform: none;
   }
   
-  .visible.sr-up, .visible.sr-left, .visible.sr-right, .visible.sr-fade {
-    opacity: 1;
-    transform: translate(0, 0);
-    transition: all 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+  /* Use high specificity to ensure these win */
+  :root .visible.sr-up, 
+  :root .visible.sr-left, 
+  :root .visible.sr-right, 
+  :root .visible.sr-fade {
+    opacity: 1 !important;
+    transform: translate(0, 0) !important;
+    transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
   }
   
   .delay-1 { transition-delay: 0.1s !important; }

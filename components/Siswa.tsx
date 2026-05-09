@@ -42,7 +42,7 @@ export default function Siswa() {
         </div>
 
         <div className="sr-up md:pr-10">
-          <h2 className="font-instrument italic text-[3rem] md:text-[3.5rem] lg:text-[4rem] text-[#5C1414] dark:text-[#F4EDE0] leading-[1.1] mb-3 whitespace-pre-line">
+          <h2 className="font-instrument italic text-[3rem] md:text-[3.5rem] lg:text-[4rem] text-[#5C1414] leading-[1.1] mb-3 whitespace-pre-line">
             {"Sistem Induk\nAnggota Kelas."}
           </h2>
           <p className="font-syne-mono text-[0.85rem] text-[var(--text-muted)] max-w-sm">
@@ -89,7 +89,7 @@ export default function Siswa() {
               return (
                 <div 
                    key={s.absen} 
-                   className="h-[260px] md:h-[280px] w-full [perspective:1200px] border border-[#EDE0CE] dark:border-[#EDE0CE]/10 sr-up group cursor-pointer"
+                   className="h-[260px] md:h-[280px] w-full [perspective:1200px] border border-[#EDE0CE] sr-up group cursor-pointer"
                    style={{ transitionDelay: `${(index % 8) * 0.05}s` }}
                    onMouseEnter={() => setFlipped(s.absen)}
                    onMouseLeave={() => setFlipped(null)}
@@ -103,7 +103,7 @@ export default function Siswa() {
                     {/* FRONT FACE */}
                     <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] bg-[var(--bg-warm)] flex flex-col justify-between group-hover:shadow-[inset_0_-4px_0_0_#C4973A] transition-shadow duration-300">
                        <div className="h-[100px] md:h-[120px] w-full relative" style={{background: bg}}>
-                          <div className="absolute bottom-[-28px] md:bottom-[-32px] left-1/2 -translate-x-1/2 w-14 h-14 md:w-16 md:h-16 rounded-full bg-[#F4EDE0]/10 dark:bg-[#1E0808]/50 border-[2px] border-[#C4973A]/60 flex items-center justify-center backdrop-blur-sm shadow-md">
+                          <div className="absolute bottom-[-28px] md:bottom-[-32px] left-1/2 -translate-x-1/2 w-14 h-14 md:w-16 md:h-16 rounded-full bg-[#F4EDE0]/20 border-[2px] border-[#C4973A]/60 flex items-center justify-center backdrop-blur-sm shadow-md">
                             <span className="font-instrument italic text-[1.1rem] md:text-[1.3rem] text-[#F4EDE0] drop-shadow-md">{getInitials(s.name)}</span>
                           </div>
                        </div>

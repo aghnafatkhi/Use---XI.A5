@@ -8,7 +8,7 @@ export default function Manifesto() {
       </div>
 
       {/* SECTION MARKER */}
-      <div className="absolute right-8 top-32 rotate-90 origin-right text-[10px] font-black tracking-[0.3em] text-[#5C14144D] dark:text-[#C4973A4D] uppercase hidden md:block">
+      <div className="absolute right-8 top-32 rotate-90 origin-right text-[10px] font-black tracking-[0.3em] text-[#5C14144D] uppercase hidden md:block">
         01 — TENTANG
       </div>
 
@@ -74,9 +74,9 @@ export default function Manifesto() {
       {/* Bottom Feature Bar (Bleeds out) */}
       <div className="mt-24 md:mt-32 max-w-7xl mx-auto bg-[#5C1414] relative z-[50] flex flex-col md:flex-row items-center justify-between px-8 md:px-12 py-10 rounded-[4px] border border-[#C4973A4D] sr-up delay-2 gap-8 md:gap-0 shadow-lg">
         <div className="flex flex-row items-center gap-12 md:gap-16 w-full md:w-auto overflow-hidden">
-          <div className="flex items-center gap-6 group">
+          <div className="flex items-center gap-10 group">
             <span className="font-syne-mono text-[36px] md:text-[48px] text-[#C4973A] transition-colors group-hover:text-[#F4EDE0]">36</span>
-            <span className="text-[#F4EDE0CC] text-[11px] md:text-[12px] font-black tracking-widest uppercase max-w-[150px] leading-tight">Warga Kelas Terdaftar</span>
+            <span className="text-[#F4EDE0CC] text-[11px] md:text-[12px] font-black tracking-widest uppercase max-w-[160px] leading-tight">Warga Kelas Terdaftar</span>
           </div>
         </div>
         

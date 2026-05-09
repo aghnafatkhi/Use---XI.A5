@@ -84,13 +84,13 @@ export default function Hero() {
           </div>
 
           {/* Info Card - Artistic Flair Style */}
-          <div className="absolute bottom-[100px] right-10 w-48 h-64 bg-[#FDFAF5] dark:bg-[#1E0808] border border-[#C4973A4D] rotate-[3deg] p-3 flex flex-col shadow-xl z-20 hover:rotate-0 transition-transform duration-500 hover:shadow-2xl">
+          <div className="absolute bottom-[100px] right-10 w-48 h-64 bg-[#FDFAF5] border border-[#C4973A4D] rotate-[3deg] p-3 flex flex-col shadow-xl z-20 hover:rotate-0 transition-transform duration-500 hover:shadow-2xl">
             <div className="h-2/3 bg-[#5C1414] relative flex items-center justify-center overflow-hidden rounded-[2px]">
                <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'repeating-linear-gradient(45deg, #F4EDE0 0px, #F4EDE0 1px, transparent 1px, transparent 10px)' }}></div>
                <span className="font-instrument italic text-4xl text-[#F4EDE0] relative z-10 transition-transform duration-500 hover:scale-110">HBP</span>
             </div>
             <div className="pt-4 text-center">
-              <p className="font-syne font-black text-[10px] text-[#3A0A0A] dark:text-[#F4EDE0] uppercase tracking-wider mb-1">Hugi Barkah P.</p>
+              <p className="font-syne font-black text-[10px] text-[#3A0A0A] uppercase tracking-wider mb-1">Hugi Barkah P.</p>
               <p className="font-syne-mono text-[8px] text-[#C4973A] uppercase">Wali Kelas • SMAN 1 Cileungsi</p>
             </div>
             <div className="absolute top-5 left-5 flex gap-1">
