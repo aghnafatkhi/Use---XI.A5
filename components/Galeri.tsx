@@ -6,6 +6,7 @@ import { staticGalleryData } from '../lib/constants';
 export default function Galeri() {
   const [activeFilter, setActiveFilter] = useState('semua');
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [galleryData, setGalleryData] = useState<any[]>(staticGalleryData);
 
   useEffect(() => {
@@ -31,12 +32,28 @@ export default function Galeri() {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (lightboxIndex === null) return;
       if (e.key === 'Escape') setLightboxIndex(null);
-      if (e.key === 'ArrowRight') setLightboxIndex((prev) => (prev! + 1) % filteredItems.length);
-      if (e.key === 'ArrowLeft') setLightboxIndex((prev) => (prev! - 1 + filteredItems.length) % filteredItems.length);
+      
+      const item = filteredItems[lightboxIndex];
+      const multi = item.images && item.images.length > 0;
+
+      if (e.key === 'ArrowRight') {
+        if (multi) {
+          setCurrentImageIndex(prev => (prev + 1) % item.images.length);
+        } else {
+          setLightboxIndex((prev) => (prev! + 1) % filteredItems.length);
+        }
+      }
+      if (e.key === 'ArrowLeft') {
+        if (multi) {
+          setCurrentImageIndex(prev => (prev - 1 + item.images.length) % item.images.length);
+        } else {
+          setLightboxIndex((prev) => (prev! - 1 + filteredItems.length) % filteredItems.length);
+        }
+      }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [lightboxIndex, filteredItems.length]);
+  }, [lightboxIndex, filteredItems]);
 
   return (
     <section id="galeri" className="relative pt-[120px] pb-[120px] bg-[var(--bg-warm)]">
@@ -76,7 +93,7 @@ export default function Galeri() {
                 data-category={item.category}
                 className={`relative overflow-hidden group cursor-pointer w-full sr-up`}
                 style={{ transitionDelay: `${(index % 6) * 0.1}s` }}
-                onClick={() => setLightboxIndex(index)}
+                onClick={() => { setLightboxIndex(index); setCurrentImageIndex(0); }}
                 role="button"
                 tabIndex={0}
                 onKeyDown={(e) => { if (e.key === 'Enter') setLightboxIndex(index); }}
@@ -123,7 +140,13 @@ export default function Galeri() {
             className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 text-[#F4EDE0]/60 hover:text-[#C4973A] p-4 focus-visible:outline-2 focus-visible:outline-[#C4973A] bg-[#3A0A0A]/50 hover:bg-[#3A0A0A] rounded-full transition-all z-50"
             onClick={(e) => { 
               e.stopPropagation(); 
-              setLightboxIndex((prev) => (prev! - 1 + filteredItems.length) % filteredItems.length);
+              const item = filteredItems[lightboxIndex];
+              if (item.images && item.images.length > 1) {
+                setCurrentImageIndex(prev => (prev - 1 + item.images.length) % item.images.length);
+              } else {
+                setLightboxIndex((prev) => (prev! - 1 + filteredItems.length) % filteredItems.length);
+                setCurrentImageIndex(0);
+              }
             }}
             aria-label="Previous image"
           >
@@ -136,7 +159,13 @@ export default function Galeri() {
             className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 text-[#F4EDE0]/60 hover:text-[#C4973A] p-4 focus-visible:outline-2 focus-visible:outline-[#C4973A] bg-[#3A0A0A]/50 hover:bg-[#3A0A0A] rounded-full transition-all z-50"
             onClick={(e) => { 
               e.stopPropagation(); 
-              setLightboxIndex((prev) => (prev! + 1) % filteredItems.length);
+              const item = filteredItems[lightboxIndex];
+              if (item.images && item.images.length > 1) {
+                setCurrentImageIndex(prev => (prev + 1) % item.images.length);
+              } else {
+                setLightboxIndex((prev) => (prev! + 1) % filteredItems.length);
+                setCurrentImageIndex(0);
+              }
             }}
             aria-label="Next image"
           >
@@ -146,8 +175,19 @@ export default function Galeri() {
           </button>
 
           <div className="w-[85vw] max-w-5xl h-[65vh] md:h-[75vh] relative rounded-md overflow-hidden shadow-2xl" onClick={(e) => e.stopPropagation()}>
-             {/* Fake image using gradient for demo */}
-             <div className="w-full h-full transition-all duration-300" style={{ background: filteredItems[lightboxIndex].bg }}></div>
+             {/* Main image or gallery */}
+             <div className="w-full h-full transition-all duration-500 ease-in-out" style={{ background: (filteredItems[lightboxIndex].images && filteredItems[lightboxIndex].images.length > 0) ? `url(${filteredItems[lightboxIndex].images[currentImageIndex]}) center/contain no-repeat` : filteredItems[lightboxIndex].bg }}>
+                {!filteredItems[lightboxIndex].images?.length && <div className="w-full h-full" style={{ background: filteredItems[lightboxIndex].bg }}></div>}
+             </div>
+             
+             {/* Gallery Pagination dots if multiple images */}
+             {(filteredItems[lightboxIndex].images?.length > 1) && (
+               <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
+                  {filteredItems[lightboxIndex].images.map((_: any, i: number) => (
+                    <div key={i} className={`w-1.5 h-1.5 rounded-full transition-all ${i === currentImageIndex ? 'bg-[#C4973A] w-4' : 'bg-white/30'}`}></div>
+                  ))}
+               </div>
+             )}
           </div>
           
           <div className="mt-8 text-center max-w-xl" onClick={(e) => e.stopPropagation()}>

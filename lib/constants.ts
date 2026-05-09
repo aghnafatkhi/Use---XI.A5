@@ -1,16 +1,16 @@
 export const staticGalleryData = [
-  { title: "Foto Bersama Pak Hugi", category: "foto-kelas", bg: "linear-gradient(135deg, #5C1414 0%, #8B3333 100%)" },
-  { title: "Praktikum Biologi Sel", category: "kegiatan", bg: "linear-gradient(160deg, #3A0A0A 0%, #6B2020 60%, #C4973A 100%)" },
-  { title: "Upacara 17 Agustus", category: "kegiatan", bg: "linear-gradient(110deg, #7A2020 0%, #4A0E0E 100%)" },
-  { title: "Baksos: Cegah Stunting", category: "momen", bg: "linear-gradient(145deg, #C4973A 0%, #8B6020 50%, #5C1414 100%)" },
-  { title: "Kimia: Asam Basa", category: "kegiatan", bg: "linear-gradient(125deg, #4A0E0E 30%, #7A3535 100%)" },
-  { title: "makan siang di kantin", category: "momen", bg: "linear-gradient(155deg, #6B2020 0%, #C4973A 100%)" },
-  { title: "Foto Kelas Pertama", category: "foto-kelas", bg: "linear-gradient(170deg, #3A0A0A 0%, #5C1414 50%, #8B4040 100%)" },
-  { title: "Piket Bersih-Bersih", category: "kegiatan", bg: "linear-gradient(120deg, #8B4020 0%, #5C1414 100%)" },
-  { title: "Ultah Dadakan Kelas", category: "momen", bg: "linear-gradient(140deg, #5C1414 0%, #C4973A 80%, #8B6020 100%)" },
-  { title: "Kunjungan Lab IPA", category: "kegiatan", bg: "linear-gradient(165deg, #4A0E0E 0%, #6B3030 100%)" },
-  { title: "Class Meeting Sengit", category: "momen", bg: "linear-gradient(130deg, #7A2020 0%, #4A0E0E 70%, #C4973A 100%)" },
-  { title: "Foto Akhir Semester Ganjil", category: "foto-kelas", bg: "linear-gradient(150deg, #3A0A0A 0%, #8B3333 100%)" },
+  { title: "Foto Bersama Pak Hugi", category: "foto-kelas", bg: "linear-gradient(135deg, #5C1414 0%, #8B3333 100%)", images: [] },
+  { title: "Praktikum Biologi Sel", category: "kegiatan", bg: "linear-gradient(160deg, #3A0A0A 0%, #6B2020 60%, #C4973A 100%)", images: [] },
+  { title: "Upacara 17 Agustus", category: "kegiatan", bg: "linear-gradient(110deg, #7A2020 0%, #4A0E0E 100%)", images: [] },
+  { title: "Baksos: Cegah Stunting", category: "momen", bg: "linear-gradient(145deg, #C4973A 0%, #8B6020 50%, #5C1414 100%)", images: [] },
+  { title: "Kimia: Asam Basa", category: "kegiatan", bg: "linear-gradient(125deg, #4A0E0E 30%, #7A3535 100%)", images: [] },
+  { title: "makan siang di kantin", category: "momen", bg: "linear-gradient(155deg, #6B2020 0%, #C4973A 100%)", images: [] },
+  { title: "Foto Kelas Pertama", category: "foto-kelas", bg: "linear-gradient(170deg, #3A0A0A 0%, #5C1414 50%, #8B4040 100%)", images: [] },
+  { title: "Piket Bersih-Bersih", category: "kegiatan", bg: "linear-gradient(120deg, #8B4020 0%, #5C1414 100%)", images: [] },
+  { title: "Ultah Dadakan Kelas", category: "momen", bg: "linear-gradient(140deg, #5C1414 0%, #C4973A 80%, #8B6020 100%)", images: [] },
+  { title: "Kunjungan Lab IPA", category: "kegiatan", bg: "linear-gradient(165deg, #4A0E0E 0%, #6B3030 100%)", images: [] },
+  { title: "Class Meeting Sengit", category: "momen", bg: "linear-gradient(130deg, #7A2020 0%, #4A0E0E 70%, #C4973A 100%)", images: [] },
+  { title: "Foto Akhir Semester Ganjil", category: "foto-kelas", bg: "linear-gradient(150deg, #3A0A0A 0%, #8B3333 100%)", images: [] },
 ];
 
 export const staticStudents = [

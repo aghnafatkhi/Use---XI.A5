@@ -8,6 +8,11 @@
         "title": { "type": "string" },
         "category": { "type": "string" },
         "bg": { "type": "string", "description": "CSS background string (gradient) or image URL" },
+        "images": { 
+          "type": "array", 
+          "items": { "type": "string" },
+          "description": "Additional image gallery"
+        },
         "createdAt": { "type": "number" }
       },
       "required": ["title", "category", "bg", "createdAt"]

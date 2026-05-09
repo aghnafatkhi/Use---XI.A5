@@ -76,7 +76,7 @@ export default function Manifesto() {
         <div className="flex flex-row items-center gap-12 md:gap-16 w-full md:w-auto overflow-hidden">
           <div className="flex items-center gap-6 group">
             <span className="font-syne-mono text-[36px] md:text-[48px] text-[#C4973A] transition-colors group-hover:text-[#F4EDE0]">36</span>
-            <span className="text-[#F4EDE0CC] text-[11px] md:text-[12px] font-black tracking-widest uppercase max-w-[100px] leading-tight">Warga Kelas Terdaftar</span>
+            <span className="text-[#F4EDE0CC] text-[11px] md:text-[12px] font-black tracking-widest uppercase max-w-[150px] leading-tight">Warga Kelas Terdaftar</span>
           </div>
         </div>
         

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, User } from 'firebase/auth';
 import { auth, db } from '../../lib/firebase';
-import { doc, getDoc, collection, addDoc, deleteDoc, onSnapshot, orderBy, query as firestoreQuery, writeBatch } from 'firebase/firestore';
+import { doc, getDoc, collection, addDoc, deleteDoc, onSnapshot, orderBy, query as firestoreQuery, writeBatch, updateDoc } from 'firebase/firestore';
 import Link from 'next/link';
 import { staticGalleryData, staticStudents } from '../../lib/constants';
 
@@ -46,6 +46,8 @@ export default function AdminPage() {
   const [galleries, setGalleries] = useState<any[]>([]);
   const [students, setStudents] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<'gallery' | 'siswa'>('gallery');
+  const [editingStudent, setEditingStudent] = useState<any | null>(null);
+  const [galleryImages, setGalleryImages] = useState<string[]>([]);
   
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (u) => {
@@ -111,26 +113,24 @@ export default function AdminPage() {
     }
   };
 
-  const addGallery = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleGalleryCreate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     const bg = fd.get('bg') as string;
     
-    if (!bg) {
-      alert('Mohon pilih gambar atau masukkan URL/Gradient');
-      return;
-    }
-
     try {
+      const timestamp = new Date().getTime();
       const newItem = {
         title: fd.get('title') as string,
         category: fd.get('category') as string,
-        bg: bg,
-        createdAt: Date.now()
+        bg: galleryImages[0] || bg || '',
+        images: galleryImages,
+        createdAt: timestamp
       };
       await addDoc(collection(db, 'gallery'), newItem);
       e.currentTarget.reset();
       setPreview(null);
+      setGalleryImages([]);
     } catch (err) {
       handleFirestoreError(err, OperationType.CREATE, 'gallery');
     }
@@ -143,7 +143,11 @@ export default function AdminPage() {
       return;
     }
     const reader = new FileReader();
-    reader.onload = (e) => setPreview(e.target?.result as string);
+    reader.onload = (e) => {
+      const result = e.target?.result as string;
+      setPreview(result);
+      setGalleryImages(prev => [...prev, result]);
+    };
     reader.readAsDataURL(file);
   };
 
@@ -158,17 +162,22 @@ export default function AdminPage() {
   const addStudent = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
-    const newItem = {
+    const itemData = {
       absen: fd.get('absen') as string,
       name: fd.get('name') as string,
       role: fd.get('role') as string,
       quote: fd.get('quote') as string,
     };
     try {
-      await addDoc(collection(db, 'students'), newItem);
+      if (editingStudent) {
+        await updateDoc(doc(db, 'students', editingStudent.id), itemData);
+        setEditingStudent(null);
+      } else {
+        await addDoc(collection(db, 'students'), itemData);
+      }
       e.currentTarget.reset();
     } catch (err) {
-      handleFirestoreError(err, OperationType.CREATE, 'students');
+      handleFirestoreError(err, OperationType.WRITE, 'students');
     }
   };
 
@@ -231,7 +240,7 @@ export default function AdminPage() {
                 <button onClick={seedGallery} className="text-xs border border-[#C4973A] px-3 py-1 rounded text-[#C4973A] hover:bg-[#C4973A] hover:text-black transition-all">Impor Data Awal</button>
               )}
             </div>
-            <form onSubmit={addGallery} className="flex flex-col gap-6 mb-8 bg-[#3A0A0A] p-6 rounded-lg border border-[#C4973A33]">
+            <form onSubmit={handleGalleryCreate} className="flex flex-col gap-6 mb-8 bg-[#3A0A0A] p-6 rounded-lg border border-[#C4973A33]">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <div 
@@ -253,9 +262,24 @@ export default function AdminPage() {
                         <span className="text-[10px] text-[#F4EDE04D] mt-1">Atau klik untuk memilih file</span>
                       </>
                     )}
-                    <input id="file-input" type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if(f) handleFile(f); }} />
-                    <input type="hidden" name="bg" value={preview || ''} />
+                    <input id="file-input" type="file" accept="image/*" multiple className="hidden" onChange={(e) => { 
+                      const files = e.target.files;
+                      if(files) {
+                        Array.from(files).forEach(f => handleFile(f));
+                      }
+                    }} />
+                    <input type="hidden" name="bg" value={galleryImages[0] || ''} />
                   </div>
+                  {galleryImages.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                       {galleryImages.map((img, i) => (
+                         <div key={i} className="relative w-12 h-12 bg-cover bg-center rounded" style={{ backgroundImage: `url(${img})` }}>
+                           <button onClick={(e) => { e.stopPropagation(); setGalleryImages(prev => prev.filter((_, idx) => idx !== i)); }} className="absolute -top-1 -right-1 bg-red-600 text-[8px] p-0.5 rounded-full">×</button>
+                         </div>
+                       ))}
+                       <button type="button" onClick={() => setGalleryImages([])} className="text-[10px] text-red-400 hover:underline">Clear All</button>
+                    </div>
+                  )}
                 </div>
                 <div className="flex flex-col space-y-4">
                   <input required name="title" placeholder="Judul Foto (e.g. Momen KBM)" className="bg-[#180808] p-3 rounded text-[#F4EDE0] text-sm border border-transparent focus:border-[#C4973A] outline-none" />
@@ -294,11 +318,18 @@ export default function AdminPage() {
               )}
             </div>
             <form onSubmit={addStudent} className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8 bg-[#3A0A0A] p-6 rounded-lg border border-[#C4973A33]">
-              <input required name="absen" placeholder="No Absen (e.g. 01)" className="bg-[#180808] p-2 rounded text-[#F4EDE0] text-sm border border-transparent focus:border-[#C4973A] outline-none" />
-              <input required name="name" placeholder="Nama Lengkap" className="bg-[#180808] p-2 rounded text-[#F4EDE0] text-sm border border-transparent focus:border-[#C4973A] outline-none" />
-              <input name="role" placeholder="Jabatan (Opsional)" className="bg-[#180808] p-2 rounded text-[#F4EDE0] text-sm border border-transparent focus:border-[#C4973A] outline-none" />
-              <input name="quote" placeholder="Kutipan/Quote" className="bg-[#180808] p-2 rounded text-[#F4EDE0] text-sm border border-transparent focus:border-[#C4973A] outline-none" />
-              <button type="submit" className="bg-[#C4973A] text-black font-bold uppercase tracking-wider rounded text-sm hover:bg-[#F4EDE0] transition-colors">Tambahkan</button>
+              <input required name="absen" defaultValue={editingStudent?.absen || ''} placeholder="No Absen (e.g. 01)" className="bg-[#180808] p-2 rounded text-[#F4EDE0] text-sm border border-transparent focus:border-[#C4973A] outline-none" />
+              <input required name="name" defaultValue={editingStudent?.name || ''} placeholder="Nama Lengkap" className="bg-[#180808] p-2 rounded text-[#F4EDE0] text-sm border border-transparent focus:border-[#C4973A] outline-none" />
+              <input name="role" defaultValue={editingStudent?.role || ''} placeholder="Jabatan (Opsional)" className="bg-[#180808] p-2 rounded text-[#F4EDE0] text-sm border border-transparent focus:border-[#C4973A] outline-none" />
+              <input name="quote" defaultValue={editingStudent?.quote || ''} placeholder="Kutipan/Quote" className="bg-[#180808] p-2 rounded text-[#F4EDE0] text-sm border border-transparent focus:border-[#C4973A] outline-none" />
+              <div className="flex gap-2">
+                <button type="submit" className="flex-1 bg-[#C4973A] text-black font-bold uppercase tracking-wider rounded text-sm hover:bg-[#F4EDE0] transition-colors">
+                  {editingStudent ? 'Simpan' : 'Tambah'}
+                </button>
+                {editingStudent && (
+                  <button type="button" onClick={() => setEditingStudent(null)} className="px-3 bg-red-900 rounded text-white text-xs">×</button>
+                )}
+              </div>
             </form>
 
             <div className="overflow-x-auto">
@@ -319,7 +350,8 @@ export default function AdminPage() {
                       <td className="p-3">{s.name}</td>
                       <td className="p-3">{s.role || '-'}</td>
                       <td className="p-3 italic text-xs text-[#F4EDE0]/60 max-w-[200px] truncate">{s.quote || '-'}</td>
-                      <td className="p-3 text-right">
+                      <td className="p-3 text-right space-x-3">
+                        <button onClick={() => setEditingStudent(s)} className="text-[#C4973A] hover:underline uppercase text-xs tracking-wider">Edit</button>
                         <button onClick={() => deleteDocItem('students', s.id)} className="text-red-400 hover:text-red-300 uppercase text-xs tracking-wider">Hapus</button>
                       </td>
                     </tr>
