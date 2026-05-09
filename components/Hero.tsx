@@ -15,7 +15,7 @@ export default function Hero() {
 
       <div className="max-w-7xl mx-auto w-full h-full flex flex-col md:flex-row relative z-10">
         {/* Left Zone */}
-        <div className="w-full md:w-[55%] h-full flex flex-col justify-center px-6 md:px-10 lg:px-12 pt-20 md:pt-0 pb-16 md:pb-0 relative text-left">
+        <div className="w-full md:w-[55%] h-full flex flex-col justify-center px-6 md:px-10 lg:px-12 pt-28 md:pt-16 pb-16 md:pb-0 relative text-left">
           
           {/* Decorative Dots */}
           <div className="absolute top-24 md:bottom-32 md:top-auto left-6 md:left-10 flex gap-2 sr-up delay-6 z-10 hidden md:flex">
