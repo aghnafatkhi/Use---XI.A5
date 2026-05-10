@@ -49,6 +49,7 @@ export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<'gallery' | 'siswa' | 'memories'>('gallery');
   const [editingStudent, setEditingStudent] = useState<any | null>(null);
   const [editingMemory, setEditingMemory] = useState<any | null>(null);
+  const [editingGallery, setEditingGallery] = useState<any | null>(null);
   const [galleryImages, setGalleryImages] = useState<string[]>([]);
   const [isCompressing, setIsCompressing] = useState(false);
 
@@ -175,23 +176,30 @@ export default function AdminPage() {
   const handleGalleryCreate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
-    const bg = fd.get('bg') as string;
+    const bgInput = fd.get('bg') as string;
     
     try {
       const timestamp = new Date().getTime();
       const newItem = {
         title: fd.get('title') as string,
         category: fd.get('category') as string,
-        bg: galleryImages[0] || bg || '',
+        bg: galleryImages[0] || bgInput || '',
         images: galleryImages,
-        createdAt: timestamp
+        createdAt: editingGallery?.createdAt || timestamp
       };
-      await addDoc(collection(db, 'gallery'), newItem);
+
+      if (editingGallery) {
+        await updateDoc(doc(db, 'gallery', editingGallery.id), newItem);
+        setEditingGallery(null);
+      } else {
+        await addDoc(collection(db, 'gallery'), newItem);
+      }
+      
       e.currentTarget.reset();
       setPreview(null);
       setGalleryImages([]);
     } catch (err) {
-      handleFirestoreError(err, OperationType.CREATE, 'gallery');
+      handleFirestoreError(err, OperationType.WRITE, 'gallery');
     }
   };
 
@@ -213,6 +221,7 @@ export default function AdminPage() {
   };
 
   const deleteDocItem = async (col: string, id: string) => {
+    if (!confirm('Apakah kamy yakin ingin menghapus data ini?')) return;
     try {
       await deleteDoc(doc(db, col, id));
     } catch (err) {
@@ -374,11 +383,15 @@ export default function AdminPage() {
                   )}
                 </div>
                 <div className="flex flex-col space-y-4">
-                  <input required name="title" placeholder="Judul Foto (e.g. Momen KBM)" className="bg-[#180808] p-3 rounded text-[#F4EDE0] text-sm border border-transparent focus:border-[#C4973A] outline-none" />
-                  <input required name="category" placeholder="Kategori (e.g. kegiatan, momen, foto-kelas)" className="bg-[#180808] p-3 rounded text-[#F4EDE0] text-sm border border-transparent focus:border-[#C4973A] outline-none" />
-                  <div className="pt-2">
-                    <p className="text-[10px] text-[#F4EDE0]/50 mb-3 uppercase tracking-tighter">* Gunakan drag & drop di kiri untuk upload gambar, atau isi manual input hidden jika perlu.</p>
-                    <button type="submit" className="w-full bg-[#C4973A] text-black font-bold uppercase tracking-widest py-3 rounded text-sm hover:bg-[#F4EDE0] transition-all">Publikasikan Ke Galeri</button>
+                  <input required name="title" defaultValue={editingGallery?.title || ''} placeholder="Judul Foto (e.g. Momen KBM)" className="bg-[#180808] p-3 rounded text-[#F4EDE0] text-sm border border-transparent focus:border-[#C4973A] outline-none" />
+                  <input required name="category" defaultValue={editingGallery?.category || ''} placeholder="Kategori (e.g. kegiatan, momen, foto-kelas)" className="bg-[#180808] p-3 rounded text-[#F4EDE0] text-sm border border-transparent focus:border-[#C4973A] outline-none" />
+                  <div className="pt-2 flex gap-2">
+                    <button type="submit" className="flex-1 bg-[#C4973A] text-black font-bold uppercase tracking-widest py-3 rounded text-sm hover:bg-[#F4EDE0] transition-all">
+                      {editingGallery ? 'Update Galeri' : 'Publikasikan Ke Galeri'}
+                    </button>
+                    {editingGallery && (
+                      <button type="button" onClick={() => { setEditingGallery(null); setPreview(null); setGalleryImages([]); }} className="px-4 bg-red-900 rounded text-white text-xs uppercase font-bold">×</button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -387,9 +400,12 @@ export default function AdminPage() {
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {galleries.map(g => (
                 <div key={g.id} className="relative aspect-[4/5] overflow-hidden group rounded-lg border border-[#C4973A4D]">
-                  <div className="absolute inset-0 bg-cover bg-center" style={{ background: g.bg.startsWith('http') ? `url(${g.bg}) center/cover no-repeat` : g.bg }}></div>
+                  <div className="absolute inset-0 bg-cover bg-center" style={{ background: g.bg.startsWith('http') || g.bg.startsWith('data:') ? `url(${g.bg}) center/cover no-repeat` : g.bg }}></div>
                   <div className="absolute inset-0 bg-black/50 p-4 flex flex-col justify-between opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => deleteDocItem('gallery', g.id)} className="self-end bg-red-900/80 text-white px-3 py-1 text-xs rounded hover:bg-red-600">Hapus</button>
+                    <div className="flex justify-between items-start">
+                      <button onClick={() => { setEditingGallery(g); setGalleryImages(g.images || []); setPreview(g.bg); setActiveTab('gallery'); window.scrollTo(0,0); }} className="bg-[#C4973A] text-black px-3 py-1 text-xs rounded hover:bg-[#F4EDE0] font-bold">Edit</button>
+                      <button onClick={() => deleteDocItem('gallery', g.id)} className="bg-red-900/80 text-white px-3 py-1 text-xs rounded hover:bg-red-600">Hapus</button>
+                    </div>
                     <div>
                       <div className="text-[#C4973A] text-[10px] uppercase font-syne mb-1">{g.category}</div>
                       <div className="text-sm font-instrument italic">{g.title}</div>

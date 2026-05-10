@@ -104,7 +104,7 @@ export default function Galeri() {
                 {/* Background Gradient */}
                 <div 
                   className="absolute inset-0 w-full h-full transition-transform duration-500 ease-out group-hover:scale-[1.03]"
-                  style={{ background: item.bg }}
+                  style={{ background: item.bg?.startsWith('http') || item.bg?.startsWith('data:') ? `url(${item.bg}) center/cover no-repeat` : item.bg }}
                 >
                   <div className="absolute inset-0 bg-[#3A0A0A]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-0"></div>
                   <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center z-10">
