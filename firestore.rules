@@ -12,11 +12,12 @@ service cloud.firestore {
     function existing() { return resource.data; }
 
     function isValidGalleryItem(data) {
-      return data.keys().hasAll(['title', 'category', 'bg', 'createdAt']) && data.keys().size() == 4
+      return data.keys().hasAll(['title', 'category', 'bg', 'createdAt', 'images']) && data.keys().size() == 5
         && data.title is string && data.title.size() <= 100
         && data.category is string && data.category.size() <= 50
-        && data.bg is string && data.bg.size() <= 1000
-        && data.createdAt is number;
+        && data.bg is string && data.bg.size() <= 2000000
+        && data.createdAt is number
+        && data.images is list;
     }
     
     match /gallery/{docId} {
@@ -27,10 +28,11 @@ service cloud.firestore {
     }
     
     function isValidStudent(data) {
-      return data.keys().hasAll(['absen', 'name']) && data.keys().size() >= 2 && data.keys().size() <= 3
+      return data.keys().hasAll(['absen', 'name']) && data.keys().size() >= 2 && data.keys().size() <= 4
         && data.absen is string && data.absen.size() <= 10
         && data.name is string && data.name.size() <= 100
-        && (data.keys().hasAll(['role']) ? (data.role is string && data.role.size() <= 100) : true);
+        && (data.keys().hasAll(['role']) ? (data.role is string && data.role.size() <= 100) : true)
+        && (data.keys().hasAll(['quote']) ? (data.quote is string && data.quote.size() <= 300) : true);
     }
     
     match /students/{docId} {

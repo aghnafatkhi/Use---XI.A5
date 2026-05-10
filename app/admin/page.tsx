@@ -116,7 +116,7 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (!isAdmin) return;
-    const unsubGal = onSnapshot(collection(db, 'gallery'), (snap) => {
+    const unsubGal = onSnapshot(firestoreQuery(collection(db, 'gallery'), orderBy('createdAt', 'desc')), (snap) => {
       setGalleries(snap.docs.map(d => ({ id: d.id, ...d.data() })));
     });
     const unsubSis = onSnapshot(firestoreQuery(collection(db, 'students'), orderBy('absen', 'asc')), (snap) => {
@@ -176,14 +176,16 @@ export default function AdminPage() {
   const handleGalleryCreate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
-    const bgInput = fd.get('bg') as string;
     
     try {
       const timestamp = new Date().getTime();
+      // Ensure we have a background image: either a newly uploaded one, a provided one from edit, or fallback to first image in array
+      const finalBg = galleryImages[0] || preview || editingGallery?.bg || '';
+      
       const newItem = {
         title: fd.get('title') as string,
         category: fd.get('category') as string,
-        bg: galleryImages[0] || bgInput || '',
+        bg: finalBg,
         images: galleryImages,
         createdAt: editingGallery?.createdAt || timestamp
       };
@@ -195,9 +197,10 @@ export default function AdminPage() {
         await addDoc(collection(db, 'gallery'), newItem);
       }
       
-      e.currentTarget.reset();
       setPreview(null);
       setGalleryImages([]);
+      // Manual reset of form fields since reset() might conflict with controlled state in some setups
+      (e.target as HTMLFormElement).reset();
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, 'gallery');
     }
@@ -459,7 +462,7 @@ export default function AdminPage() {
                       <td className="p-3">{s.role || '-'}</td>
                       <td className="p-3 italic text-xs text-[#F4EDE0]/60 max-w-[200px] truncate">{s.quote || '-'}</td>
                       <td className="p-3 text-right space-x-3">
-                        <button onClick={() => setEditingStudent(s)} className="text-[#C4973A] hover:underline uppercase text-xs tracking-wider">Edit</button>
+                        <button onClick={() => { setEditingStudent(s); window.scrollTo(0,0); }} className="text-[#C4973A] hover:underline uppercase text-xs tracking-wider">Edit</button>
                         <button onClick={() => deleteDocItem('students', s.id)} className="text-red-400 hover:text-red-300 uppercase text-xs tracking-wider">Hapus</button>
                       </td>
                     </tr>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, onSnapshot } from 'firebase/firestore';
+import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { staticGalleryData } from '../lib/constants';
 
@@ -10,7 +10,8 @@ export default function Galeri() {
   const [galleryData, setGalleryData] = useState<any[]>(staticGalleryData);
 
   useEffect(() => {
-    const unsub = onSnapshot(collection(db, 'gallery'), (snap) => {
+    const q = query(collection(db, 'gallery'), orderBy('createdAt', 'desc'));
+    const unsub = onSnapshot(q, (snap) => {
       if (!snap.empty) {
         setGalleryData(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
       } else {
@@ -176,8 +177,18 @@ export default function Galeri() {
 
           <div className="w-[85vw] max-w-5xl h-[65vh] md:h-[75vh] relative rounded-md overflow-hidden shadow-2xl" onClick={(e) => e.stopPropagation()}>
              {/* Main image or gallery */}
-             <div className="w-full h-full transition-all duration-500 ease-in-out" style={{ background: (filteredItems[lightboxIndex].images && filteredItems[lightboxIndex].images.length > 0) ? `url(${filteredItems[lightboxIndex].images[currentImageIndex]}) center/contain no-repeat` : filteredItems[lightboxIndex].bg }}>
-                {!filteredItems[lightboxIndex].images?.length && <div className="w-full h-full" style={{ background: filteredItems[lightboxIndex].bg }}></div>}
+             <div 
+               className="w-full h-full transition-all duration-500 ease-in-out" 
+               style={{ 
+                 background: (filteredItems[lightboxIndex].images && filteredItems[lightboxIndex].images.length > 0) 
+                   ? `url(${filteredItems[lightboxIndex].images[currentImageIndex]}) center/contain no-repeat` 
+                   : (filteredItems[lightboxIndex].bg?.startsWith('http') || filteredItems[lightboxIndex].bg?.startsWith('data:') 
+                     ? `url(${filteredItems[lightboxIndex].bg}) center/contain no-repeat` 
+                     : filteredItems[lightboxIndex].bg) 
+               }}
+             >
+                {/* Fallback for cases where background is transparent/missing */}
+                {!filteredItems[lightboxIndex].images?.length && !filteredItems[lightboxIndex].bg && <div className="w-full h-full bg-[#3A0A0A]/20"></div>}
              </div>
              
              {/* Gallery Pagination dots if multiple images */}
