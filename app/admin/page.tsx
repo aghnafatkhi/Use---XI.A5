@@ -5,7 +5,7 @@ import { signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, User 
 import { auth, db } from '../../lib/firebase';
 import { doc, getDoc, collection, addDoc, deleteDoc, onSnapshot, orderBy, query as firestoreQuery, writeBatch, updateDoc } from 'firebase/firestore';
 import Link from 'next/link';
-import { staticGalleryData, staticStudents } from '../../lib/constants';
+import { staticGalleryData, staticStudents, staticMemories } from '../../lib/constants';
 
 enum OperationType {
   CREATE = 'create',
@@ -45,9 +45,50 @@ export default function AdminPage() {
 
   const [galleries, setGalleries] = useState<any[]>([]);
   const [students, setStudents] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState<'gallery' | 'siswa'>('gallery');
+  const [memories, setMemories] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState<'gallery' | 'siswa' | 'memories'>('gallery');
   const [editingStudent, setEditingStudent] = useState<any | null>(null);
+  const [editingMemory, setEditingMemory] = useState<any | null>(null);
   const [galleryImages, setGalleryImages] = useState<string[]>([]);
+  const [isCompressing, setIsCompressing] = useState(false);
+
+  const compressImage = (file: File, maxWidth = 1200, maxHeight = 1200, quality = 0.8): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target?.result as string;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > maxWidth) {
+              height *= maxWidth / width;
+              width = maxWidth;
+            }
+          } else {
+            if (height > maxHeight) {
+              width *= maxHeight / height;
+              height = maxHeight;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+          
+          const dataUrl = canvas.toDataURL('image/jpeg', quality);
+          resolve(dataUrl);
+        };
+        img.onerror = reject;
+      };
+      reader.onerror = reject;
+    });
+  };
   
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (u) => {
@@ -80,7 +121,10 @@ export default function AdminPage() {
     const unsubSis = onSnapshot(firestoreQuery(collection(db, 'students'), orderBy('absen', 'asc')), (snap) => {
       setStudents(snap.docs.map(d => ({ id: d.id, ...d.data() })));
     });
-    return () => { unsubGal(); unsubSis(); }
+    const unsubMem = onSnapshot(firestoreQuery(collection(db, 'memories'), orderBy('order', 'asc')), (snap) => {
+      setMemories(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    });
+    return () => { unsubGal(); unsubSis(); unsubMem(); }
   }, [isAdmin]);
 
   const seedGallery = async () => {
@@ -113,6 +157,21 @@ export default function AdminPage() {
     }
   };
 
+  const seedMemories = async () => {
+    if (!confirm('Impor data catatan perjalanan awal?')) return;
+    try {
+      const batch = writeBatch(db);
+      staticMemories.forEach(item => {
+        const newDoc = doc(collection(db, 'memories'));
+        batch.set(newDoc, item);
+      });
+      await batch.commit();
+      alert('Data catatan perjalanan berhasil diimpor!');
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const handleGalleryCreate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
@@ -137,18 +196,20 @@ export default function AdminPage() {
   };
 
   const [preview, setPreview] = useState<string | null>(null);
-  const handleFile = (file: File) => {
-    if (file.size > 800000) {
-      alert('File terlalu besar (Maks 800KB untuk optimalitas database)');
-      return;
+  const handleFile = async (file: File) => {
+    setIsCompressing(true);
+    try {
+      // Automatic compression to keep things under ~500kb-800kb while maintaining quality
+      const compressedBase64 = await compressImage(file, 1600, 1600, 0.75);
+      
+      setPreview(compressedBase64);
+      setGalleryImages(prev => [...prev, compressedBase64]);
+    } catch (err) {
+      console.error('Compression error:', err);
+      alert('Gagal memproses gambar');
+    } finally {
+      setIsCompressing(false);
     }
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const result = e.target?.result as string;
-      setPreview(result);
-      setGalleryImages(prev => [...prev, result]);
-    };
-    reader.readAsDataURL(file);
   };
 
   const deleteDocItem = async (col: string, id: string) => {
@@ -178,6 +239,31 @@ export default function AdminPage() {
       e.currentTarget.reset();
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, 'students');
+    }
+  };
+
+  const addMemory = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    const itemData = {
+      title: fd.get('title') as string,
+      date: fd.get('date') as string,
+      desc: fd.get('desc') as string,
+      rotate: fd.get('rotate') as string,
+      bg: fd.get('bg') as string,
+      order: Number(fd.get('order')),
+    };
+    try {
+      if (editingMemory) {
+        await updateDoc(doc(db, 'memories', editingMemory.id), itemData);
+        setEditingMemory(null);
+      } else {
+        await addDoc(collection(db, 'memories'), itemData);
+      }
+      e.currentTarget.reset();
+      setPreview(null);
+    } catch (err) {
+      handleFirestoreError(err, OperationType.WRITE, 'memories');
     }
   };
 
@@ -230,6 +316,7 @@ export default function AdminPage() {
         <div className="flex space-x-4 mb-8">
           <button onClick={() => setActiveTab('gallery')} className={`px-4 py-2 font-syne uppercase text-sm ${activeTab === 'gallery' ? 'bg-[#C4973A] text-black font-bold' : 'bg-[#3A0A0A] text-[#F4EDE0] border border-[#C4973A4D] hover:border-[#C4973A]'}`}>Gallery</button>
           <button onClick={() => setActiveTab('siswa')} className={`px-4 py-2 font-syne uppercase text-sm ${activeTab === 'siswa' ? 'bg-[#C4973A] text-black font-bold' : 'bg-[#3A0A0A] text-[#F4EDE0] border border-[#C4973A4D] hover:border-[#C4973A]'}`}>Warga Kelas</button>
+          <button onClick={() => setActiveTab('memories')} className={`px-4 py-2 font-syne uppercase text-sm ${activeTab === 'memories' ? 'bg-[#C4973A] text-black font-bold' : 'bg-[#3A0A0A] text-[#F4EDE0] border border-[#C4973A4D] hover:border-[#C4973A]'}`}>Catatan Perjalanan</button>
         </div>
 
         {activeTab === 'gallery' && (
@@ -249,7 +336,12 @@ export default function AdminPage() {
                     className="border-2 border-dashed border-[#C4973A4D] rounded-lg h-48 flex flex-col items-center justify-center relative overflow-hidden group hover:border-[#C4973A] transition-colors cursor-pointer"
                     onClick={() => document.getElementById('file-input')?.click()}
                   >
-                    {preview ? (
+                    {isCompressing ? (
+                      <div className="flex flex-col items-center animate-pulse">
+                        <div className="w-8 h-8 border-2 border-[#C4973A] border-t-transparent rounded-full animate-spin mb-2"></div>
+                        <span className="text-[10px] font-syne uppercase tracking-widest text-[#C4973A]">Memproses...</span>
+                      </div>
+                    ) : preview ? (
                       <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${preview})` }}></div>
                     ) : (
                       <>
@@ -361,6 +453,92 @@ export default function AdminPage() {
                   )}
                 </tbody>
               </table>
+            </div>
+          </section>
+        )}
+
+        {activeTab === 'memories' && (
+          <section className="mb-12">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-syne font-bold uppercase tracking-widest text-[#C4973A]">Manage Catatan Perjalanan</h2>
+              {memories.length === 0 && (
+                <button onClick={seedMemories} className="text-xs border border-[#C4973A] px-3 py-1 rounded text-[#C4973A] hover:bg-[#C4973A] hover:text-black transition-all">Impor Data Awal</button>
+              )}
+            </div>
+            <form onSubmit={addMemory} className="flex flex-col gap-6 mb-8 bg-[#3A0A0A] p-6 rounded-lg border border-[#C4973A33]">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div 
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer.files[0]; if(f) handleFile(f); }}
+                    className="border-2 border-dashed border-[#C4973A4D] rounded-lg h-48 flex flex-col items-center justify-center relative overflow-hidden group hover:border-[#C4973A] transition-colors cursor-pointer"
+                    onClick={() => document.getElementById('memory-file')?.click()}
+                  >
+                    {isCompressing ? (
+                      <div className="flex flex-col items-center animate-pulse">
+                        <div className="w-8 h-8 border-2 border-[#C4973A] border-t-transparent rounded-full animate-spin mb-2"></div>
+                        <span className="text-[10px] font-syne uppercase tracking-widest text-[#C4973A]">Memproses...</span>
+                      </div>
+                    ) : (preview || editingMemory?.bg) ? (
+                      <div className="absolute inset-0 bg-cover bg-center" style={{ background: (preview || editingMemory?.bg).startsWith('http') || (preview || editingMemory?.bg).startsWith('data:') ? `url(${preview || editingMemory.bg}) center/cover no-repeat` : (preview || editingMemory?.bg) }}></div>
+                    ) : (
+                      <>
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[#C4973A] mb-2 opacity-50 group-hover:opacity-100 transition-opacity">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                          <polyline points="17 8 12 3 7 8"></polyline>
+                          <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <span className="text-xs font-syne uppercase tracking-widest text-[#C4973A80]">Upload Foto Polaroid</span>
+                      </>
+                    )}
+                    <input id="memory-file" type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if(f) handleFile(f); }} />
+                    <input type="hidden" name="bg" value={preview || editingMemory?.bg || ''} />
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 gap-4">
+                  <input required name="title" defaultValue={editingMemory?.title || ''} placeholder="Judul Momen" className="bg-[#180808] p-3 rounded text-[#F4EDE0] text-sm border border-transparent focus:border-[#C4973A] outline-none" />
+                  <div className="grid grid-cols-2 gap-4">
+                    <input required name="date" defaultValue={editingMemory?.date || ''} placeholder="Tanggal (e.g. Agustus 2025)" className="bg-[#180808] p-3 rounded text-[#F4EDE0] text-sm border border-transparent focus:border-[#C4973A] outline-none" />
+                    <input required name="order" type="number" defaultValue={editingMemory?.order || memories.length + 1} placeholder="Urutan (1, 2, ...)" className="bg-[#180808] p-3 rounded text-[#F4EDE0] text-sm border border-transparent focus:border-[#C4973A] outline-none" />
+                  </div>
+                  <input name="rotate" defaultValue={editingMemory?.rotate || '0deg'} placeholder="Rotasi (e.g. -2deg, 1.5deg)" className="bg-[#180808] p-3 rounded text-[#F4EDE0] text-sm border border-transparent focus:border-[#C4973A] outline-none" />
+                  <textarea required name="desc" defaultValue={editingMemory?.desc || ''} placeholder="Deskripsi pendek momen..." className="bg-[#180808] p-3 rounded text-[#F4EDE0] text-sm border border-transparent focus:border-[#C4973A] outline-none h-20" />
+                  
+                  <div className="flex gap-2 mt-2">
+                    <button type="submit" className="flex-1 bg-[#C4973A] text-black font-bold uppercase tracking-widest py-3 rounded text-sm hover:bg-[#F4EDE0] transition-all">
+                       {editingMemory ? 'Update Memori' : 'Simpan Memori'}
+                    </button>
+                    {editingMemory && (
+                      <button type="button" onClick={() => { setEditingMemory(null); setPreview(null); }} className="px-6 bg-red-900 rounded text-white uppercase text-xs tracking-widest">Cancel</button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </form>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {memories.map(m => (
+                <div key={m.id} className="bg-[#FDFAF5] p-3 pb-8 shadow-lg group relative">
+                   <div className="h-48 w-full relative flex items-center justify-center overflow-hidden" style={{ background: m.bg.startsWith('http') || m.bg.startsWith('data:') ? `url(${m.bg}) center/cover no-repeat` : m.bg }}>
+                      {!m.bg.startsWith('http') && !m.bg.startsWith('data:') && <span className="text-[#3A0A0A]/30 font-bold">No Image</span>}
+                   </div>
+                   <div className="mt-4 px-2">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="text-[#3A0A0A] font-bold text-sm">{m.title}</h3>
+                          <p className="text-[#C4973A] text-[10px] font-syne-mono">{m.date}</p>
+                        </div>
+                        <span className="bg-[#C4973A] text-black text-[10px] px-2 py-0.5 rounded-full font-bold">#{m.order}</span>
+                      </div>
+                      <p className="text-[#3A0A0A]/70 text-[11px] mt-2 line-clamp-2 italic">{m.desc}</p>
+                      
+                      <div className="mt-4 flex justify-end space-x-4 border-t border-black/5 pt-3">
+                         <button onClick={() => { setEditingMemory(m); setActiveTab('memories'); window.scrollTo(0,0); }} className="text-[#C4973A] text-xs font-bold uppercase tracking-wider hover:underline">Edit</button>
+                         <button onClick={() => deleteDocItem('memories', m.id)} className="text-red-600 text-xs font-bold uppercase tracking-wider hover:underline">Hapus</button>
+                      </div>
+                   </div>
+                </div>
+              ))}
             </div>
           </section>
         )}

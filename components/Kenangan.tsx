@@ -1,16 +1,27 @@
 import { useRef, useState, useEffect } from 'react';
-
-const memories = [
-  { id: 1, title: "Masa Orientasi", date: "Agustus 2025", desc: "Hari pertama berkumpul sebagai kesatuan XI IPA 5.", rotate: "-2deg", bg: "linear-gradient(135deg, #5C1414 0%, #8B3333 100%)" },
-  { id: 2, title: "Persiapan Ujian", date: "Oktober 2025", desc: "Kegiatan belajar bersama menjelang Evaluasi Tengah Semester.", rotate: "1.5deg", bg: "linear-gradient(160deg, #3A0A0A 0%, #6B2020 60%)" },
-  { id: 3, title: "Partisipasi PORSENI", date: "November 2025", desc: "Menjalin sportivitas dan kreativitas kelas.", rotate: "-1deg", bg: "linear-gradient(145deg, #C4973A 0%, #8B6020 50%, #5C1414 100%)" },
-  { id: 4, title: "Solidaritas Harian", date: "Sepanjang Tahun", desc: "Interaksi edukatif dan kolaboratif antar siswa sehari-hari.", rotate: "2deg", bg: "linear-gradient(125deg, #4A0E0E 30%, #7A3535 100%)" },
-  { id: 5, title: "Tutup Tahun Akademik", date: "2025–2026", desc: "Catatan penutup satu siklus studi.", rotate: "-1.5deg", bg: "linear-gradient(170deg, #5C1414 0%, #C4973A 100%)" }
-];
+import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
+import { db } from '../lib/firebase';
 
 export default function Kenangan() {
+  const [memories, setMemories] = useState<any[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
+
+  useEffect(() => {
+    const q = query(collection(db, 'memories'), orderBy('order', 'asc'));
+    const unsub = onSnapshot(q, (snap) => {
+      if (!snap.empty) {
+        setMemories(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      } else {
+        // Fallback for first time or if empty
+        setMemories([
+          { id: '1', title: "Masa Orientasi", date: "Agustus 2025", desc: "Hari pertama berkumpul sebagai kesatuan XI IPA 5.", rotate: "-2deg", bg: "linear-gradient(135deg, #5C1414 0%, #8B3333 100%)" },
+          { id: '2', title: "Persiapan Ujian", date: "Oktober 2025", desc: "Kegiatan belajar bersama menjelang Evaluasi Tengah Semester.", rotate: "1.5deg", bg: "linear-gradient(160deg, #3A0A0A 0%, #6B2020 60%)" }
+        ]);
+      }
+    });
+    return () => unsub();
+  }, []);
 
   const scrollBy = (offset: number) => {
     if (scrollRef.current) {
@@ -69,7 +80,7 @@ export default function Kenangan() {
                  <div className="absolute top-[-10px] left-1/2 -translate-x-1/2 w-[60px] h-[20px] bg-[#C4973A]/35 -rotate-6 z-10 mix-blend-multiply opacity-80"></div>
 
                  {/* Image Area */}
-                 <div className="h-[240px] w-full relative flex items-center justify-center overflow-hidden" style={{ background: m.bg }}>
+                 <div className="h-[240px] w-full relative flex items-center justify-center overflow-hidden" style={{ background: m.bg?.startsWith('http') || m.bg?.startsWith('data:') ? `url(${m.bg}) center/cover no-repeat` : m.bg }}>
                    <div className="absolute inset-0 bg-[#1E0808]/10 group-hover:opacity-0 transition-opacity duration-500"></div>
                    <span className="font-syne font-bold text-[0.8rem] md:text-[0.85rem] text-[#F4EDE0]/90 uppercase tracking-[0.1em] z-10 px-4 text-center leading-snug drop-shadow-md">
                      {m.title}

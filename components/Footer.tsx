@@ -56,6 +56,37 @@ export default function Footer() {
 
         {/* RIGHT */}
         <div className="md:w-1/3 flex flex-col md:items-end">
+          <div className="flex flex-col mb-8 md:items-end">
+            <span className="block font-syne font-extrabold text-[9px] text-[#C4973A]/60 tracking-[0.2em] uppercase mb-4 md:text-right">
+              Media Sosial
+            </span>
+            <div className="flex flex-col space-y-1 md:text-right">
+              <a 
+                href="https://www.youtube.com/@epsilonsciencee" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="font-syne text-[0.8rem] text-[#F4EDE0]/50 hover:text-[#C4973A] leading-[2] transition-colors"
+              >
+                YouTube
+              </a>
+              <a 
+                href="https://www.instagram.com/epsilonscience5" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="font-syne text-[0.8rem] text-[#F4EDE0]/50 hover:text-[#C4973A] leading-[2] transition-colors"
+              >
+                Instagram
+              </a>
+              <a 
+                href="https://www.tiktok.com/@epsil0nsciencee" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="font-syne text-[0.8rem] text-[#F4EDE0]/50 hover:text-[#C4973A] leading-[2] transition-colors"
+              >
+                TikTok
+              </a>
+            </div>
+          </div>
           <div className="flex flex-col">
             <span className="block font-syne font-extrabold text-[9px] text-[#C4973A]/60 tracking-[0.2em] uppercase mb-4 md:text-right">
               Kelas Kami

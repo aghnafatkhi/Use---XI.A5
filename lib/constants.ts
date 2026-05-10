@@ -51,3 +51,11 @@ export const staticStudents = [
   { absen: '35', name: 'Salsabila Zahra', role: '' },
   { absen: '36', name: 'Zahra Nur Fadillah', role: '' }
 ];
+
+export const staticMemories = [
+  { title: "Masa Orientasi", date: "Agustus 2025", desc: "Hari pertama berkumpul sebagai kesatuan XI IPA 5.", rotate: "-2deg", bg: "linear-gradient(135deg, #5C1414 0%, #8B3333 100%)", order: 1 },
+  { title: "Persiapan Ujian", date: "Oktober 2025", desc: "Kegiatan belajar bersama menjelang Evaluasi Tengah Semester.", rotate: "1.5deg", bg: "linear-gradient(160deg, #3A0A0A 0%, #6B2020 60%)", order: 2 },
+  { title: "Partisipasi PORSENI", date: "November 2025", desc: "Menjalin sportivitas dan kreativitas kelas.", rotate: "-1deg", bg: "linear-gradient(145deg, #C4973A 0%, #8B6020 50%, #5C1414 100%)", order: 3 },
+  { title: "Solidaritas Harian", date: "Sepanjang Tahun", desc: "Interaksi edukatif dan kolaboratif antar siswa sehari-hari.", rotate: "2deg", bg: "linear-gradient(125deg, #4A0E0E 30%, #7A3535 100%)", order: 4 },
+  { title: "Tutup Tahun Akademik", date: "2025–2026", desc: "Catatan penutup satu siklus studi.", rotate: "-1.5deg", bg: "linear-gradient(170deg, #5C1414 0%, #C4973A 100%)", order: 5 }
+];

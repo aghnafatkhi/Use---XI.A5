@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Youtube, Instagram } from 'lucide-react';
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -20,6 +21,16 @@ export default function Navbar() {
     { label: 'Kenangan', href: '#kenangan' },
   ];
 
+  const socialLinks = [
+    { icon: <Instagram size={16} />, href: 'https://www.instagram.com/epsilonscience5', label: 'Instagram' },
+    { icon: <Youtube size={16} />, href: 'https://www.youtube.com/@epsilonsciencee', label: 'YouTube' },
+    { icon: (
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
+      </svg>
+    ), href: 'https://www.tiktok.com/@epsil0nsciencee', label: 'TikTok' },
+  ];
+
   return (
     <>
       <nav 
@@ -33,7 +44,7 @@ export default function Navbar() {
           </div>
 
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center space-x-6">
+          <div className="hidden md:flex items-center space-x-10">
             <div className="flex items-center gap-8">
               {navLinks.map((link, index) => (
                 <div key={link.href} className="flex items-center gap-8">
@@ -47,6 +58,21 @@ export default function Navbar() {
                     <span className="w-1 h-1 rounded-full bg-[#C4973A]"></span>
                   )}
                 </div>
+              ))}
+            </div>
+
+            <div className="flex items-center gap-5 pl-4 border-l border-[#C4973A33]">
+              {socialLinks.map((social) => (
+                <a 
+                  key={social.label}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#3A0A0A]/60 hover:text-[#C4973A] transition-colors"
+                  aria-label={social.label}
+                >
+                  {social.icon}
+                </a>
               ))}
             </div>
           </div>
@@ -72,7 +98,7 @@ export default function Navbar() {
           <div className="flex justify-end mb-12">
             <button onClick={() => setMenuOpen(false)} aria-label="Close menu" className="text-[var(--text-primary)] text-3xl opacity-60 hover:text-[#C4973A]">&times;</button>
           </div>
-          <div className="flex flex-col space-y-6">
+          <div className="flex flex-col space-y-6 flex-grow">
             {navLinks.map((link, index) => (
               <a 
                 key={link.href} 
@@ -83,6 +109,24 @@ export default function Navbar() {
               >
                 <span className="font-instrument text-[#C4973A] text-lg mr-4 not-italic relative -top-1">ε</span>
                 {link.label}
+              </a>
+            ))}
+          </div>
+
+          <div className="mt-auto py-10 border-t border-[#C4973A33] flex items-center justify-center gap-10">
+            {socialLinks.map((social) => (
+              <a 
+                key={social.label}
+                href={social.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#C4973A] opacity-60 hover:opacity-100 transition-opacity"
+                aria-label={social.label}
+              >
+                {/* Scale up social icons for mobile */}
+                <div className="scale-125">
+                  {social.icon}
+                </div>
               </a>
             ))}
           </div>
