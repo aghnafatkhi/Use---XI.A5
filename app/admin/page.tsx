@@ -380,7 +380,7 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-[#130606] text-[#F4EDE0] p-4 md:p-8">
       <div className="max-w-5xl mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 md:mb-10 pb-4 border-b border-[#C4973A33]">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 pb-4 border-b border-[#C4973A33]">
           <h1 className="text-2xl md:text-3xl font-instrument italic text-[#C4973A] mb-4 md:mb-0">Panel Admin XI.A5</h1>
           <div className="flex items-center space-x-4 md:space-x-6">
             <Link href="/" className="text-[10px] md:text-sm uppercase tracking-widest text-[#F4EDE0]/70 hover:text-[#C4973A]">Kembali ke Web</Link>
@@ -389,7 +389,7 @@ export default function AdminPage() {
         </div>
 
         <div className="flex overflow-x-auto pb-2 mb-8 no-scrollbar md:space-x-4 gap-3">
-          <button onClick={() => setActiveTab('gallery')} className={`whitespace-nowrap px-4 py-2 font-syne uppercase text-[10px] md:text-sm flex-shrink-0 ${activeTab === 'gallery' ? 'bg-[#C4973A] text-black font-bold' : 'bg-[#3A0A0A] text-[#F4EDE0] border border-[#C4973A4D] hover:border-[#C4973A]'}`}>Gallery</button>
+          <button onClick={() => setActiveTab('gallery')} className={`whitespace-nowrap px-4 py-2 font-syne uppercase text-[10px] md:text-sm flex-shrink-0 ${activeTab === 'gallery' ? 'bg-[#C4973A] text-black font-bold' : 'bg-[#3A0A0A] text-[#F4EDE0] border border-[#C4973A4D] hover:border-[#C4973A]'}`}>Galeri Foto</button>
           <button onClick={() => setActiveTab('siswa')} className={`whitespace-nowrap px-4 py-2 font-syne uppercase text-[10px] md:text-sm flex-shrink-0 ${activeTab === 'siswa' ? 'bg-[#C4973A] text-black font-bold' : 'bg-[#3A0A0A] text-[#F4EDE0] border border-[#C4973A4D] hover:border-[#C4973A]'}`}>Anggota Kelas</button>
           <button onClick={() => setActiveTab('memories')} className={`whitespace-nowrap px-4 py-2 font-syne uppercase text-[10px] md:text-sm flex-shrink-0 ${activeTab === 'memories' ? 'bg-[#C4973A] text-black font-bold' : 'bg-[#3A0A0A] text-[#F4EDE0] border border-[#C4973A4D] hover:border-[#C4973A]'}`}>Catatan Perjalanan</button>
         </div>
@@ -397,7 +397,7 @@ export default function AdminPage() {
         {activeTab === 'gallery' && (
           <section className="mb-12">
                   <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-lg md:text-xl font-syne font-bold uppercase tracking-widest text-[#C4973A]">Manage Gallery</h2>
+                    <h2 className="text-lg md:text-xl font-syne font-bold uppercase tracking-widest text-[#C4973A]">Kelola Galeri Foto</h2>
                     {galleries.length === 0 && (
                       <button onClick={seedGallery} className="text-[10px] md:text-xs border border-[#C4973A] px-2 md:px-3 py-1 rounded text-[#C4973A] hover:bg-[#C4973A] hover:text-black transition-all">Impor Data Awal</button>
                     )}
@@ -423,7 +423,7 @@ export default function AdminPage() {
                           <polyline points="17 8 12 3 7 8"></polyline>
                           <line x1="12" y1="3" x2="12" y2="15"></line>
                         </svg>
-                        <span className="text-xs font-syne uppercase tracking-widest text-[#C4973A80]">Upload Gambar</span>
+                        <span className="text-xs font-syne uppercase tracking-widest text-[#C4973A80]">Upload Foto</span>
                         <span className="text-[9px] text-[#F4EDE04D] mt-1 text-center px-4">Bisa pilih banyak sekaligus atau satu per satu</span>
                       </>
                     )}
@@ -437,7 +437,7 @@ export default function AdminPage() {
                   </div>
                   {galleryImages.length > 0 && (
                     <div className="bg-[#180808] p-3 rounded border border-[#C4973A33]">
-                      <p className="text-[10px] uppercase font-syne tracking-widest text-[#C4973A] mb-3">Antrean Gambar ({galleryImages.length})</p>
+                      <p className="text-[10px] uppercase font-syne tracking-widest text-[#C4973A] mb-3">Antrean Foto ({galleryImages.length})</p>
                       <div className="flex flex-wrap gap-3">
                          {galleryImages.map((img, i) => (
                            <div key={i} className="relative w-16 h-16 bg-cover bg-center rounded border border-[#C4973A4D]" style={{ backgroundImage: `url(${img})` }}>
@@ -453,16 +453,16 @@ export default function AdminPage() {
                            </button>
                          )}
                       </div>
-                      <p className="text-[9px] text-[#F4EDE04D] mt-3 italic">* Gambar pertama otomatis menjadi sampul (background).</p>
+                      <p className="text-[9px] text-[#F4EDE04D] mt-3 italic">* Foto pertama otomatis menjadi sampul (background).</p>
                     </div>
                   )}
                 </div>
                 <div className="flex flex-col space-y-4">
                   <input required name="title" defaultValue={editingGallery?.title || ''} placeholder="Judul Foto (e.g. Momen KBM)" className="bg-[#180808] p-3 rounded text-[#F4EDE0] text-sm border border-transparent focus:border-[#C4973A] outline-none" />
-                  <input required name="category" defaultValue={editingGallery?.category || ''} placeholder="Kategori (e.g. kegiatan, momen, foto-kelas)" className="bg-[#180808] p-3 rounded text-[#F4EDE0] text-sm border border-transparent focus:border-[#C4973A] outline-none" />
+                  <input required name="category" maxLength={50} defaultValue={editingGallery?.category || ''} placeholder="Deskripsi Momen (Maks. 50 Karakter)" className="bg-[#180808] p-3 rounded text-[#F4EDE0] text-sm border border-transparent focus:border-[#C4973A] outline-none" />
                   <div className="pt-2 flex gap-2">
                     <button type="submit" className="flex-1 bg-[#C4973A] text-black font-bold uppercase tracking-widest py-3 rounded text-sm hover:bg-[#F4EDE0] transition-all">
-                      {editingGallery ? 'Update Galeri' : 'Publikasikan Ke Galeri'}
+                      {editingGallery ? 'Update Galeri' : 'Tambah Ke Galeri'}
                     </button>
                     {editingGallery && (
                       <button type="button" onClick={() => { setEditingGallery(null); setPreview(null); setGalleryImages([]); }} className="px-4 bg-red-900 rounded text-white text-xs uppercase font-bold">×</button>
