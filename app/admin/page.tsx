@@ -42,6 +42,7 @@ export default function AdminPage() {
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [authError, setAuthError] = useState<string | null>(null);
 
   const [galleries, setGalleries] = useState<any[]>([]);
   const [students, setStudents] = useState<any[]>([]);
@@ -97,7 +98,7 @@ export default function AdminPage() {
     const unsub = onAuthStateChanged(auth, async (u) => {
       setUser(u);
       if (u) {
-        if (u.email === 'aghna1011@gmail.com') {
+        if (u.email === 'aghna1011@gmail.com' || u.email === 'ghinaayundiafairuzsosiologix1@gmail.com') {
           setIsAdmin(true);
         } else {
           try {
@@ -343,12 +344,18 @@ export default function AdminPage() {
   };
 
   const login = async () => {
+    setAuthError(null);
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
     try {
       await signInWithPopup(auth, provider);
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
+      let errorMsg = e?.message || String(e);
+      if (e?.code === 'auth/popup-blocked') {
+        errorMsg = 'Popup login diblokir oleh browser. Harap ijinkan popup untuk situs ini atau gunakan browser lain.';
+      }
+      setAuthError(errorMsg);
     }
   };
 
@@ -356,12 +363,23 @@ export default function AdminPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#180808]">
-        <div className="bg-[#3A0A0A] p-8 rounded-lg border border-[#C4973A4D] shadow-xl text-center">
-          <h1 className="text-2xl font-instrument italic text-[#C4973A] mb-6">Admin Login</h1>
-          <button onClick={login} className="px-6 py-2 bg-[#C4973A] text-black font-bold uppercase tracking-wider rounded text-sm hover:bg-[#F4EDE0] transition-colors">
-            Login with Google
+      <div className="min-h-screen flex items-center justify-center bg-[#180808] p-4 text-center">
+        <div className="bg-[#3A0A0A] p-8 rounded-lg border border-[#C4973A4D] shadow-xl max-w-md w-full">
+          <h1 className="text-2xl font-instrument italic text-[#C4973A] mb-4">Admin Login</h1>
+          <p className="text-xs text-[#F4EDE0]/70 mb-6">
+            Khusus Admin Kelas (aghna1011@gmail.com & ghinaayundiafairuzsosiologix1@gmail.com)
+          </p>
+          <button onClick={login} className="w-full px-6 py-2 bg-[#C4973A] text-black font-bold uppercase tracking-wider rounded text-sm hover:bg-[#F4EDE0] transition-colors">
+            Login dengan Google
           </button>
+          {authError && (
+            <div className="mt-4 p-3 bg-red-950/50 border border-red-500/50 text-red-200 text-[11px] rounded text-left">
+              <strong>Error:</strong> {authError}
+              <div className="mt-2 text-red-300">
+                💡 <em>Tips:</em> Jika kamu membuka dalam iframe (layar preview di AI Studio), pastikan Anda mengeklik tombol <strong>&quot;Open in New Tab&quot;</strong> di kanan atas preview, lalu coba login dari tab baru tersebut.
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -370,9 +388,26 @@ export default function AdminPage() {
   if (!isAdmin) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#180808] p-4 text-center">
-        <h1 className="text-xl text-[#F4EDE0] mb-4">Kamu tidak memiliki akses Admin.</h1>
-        <p className="text-sm text-[#F4EDE0]/70 mb-6">UID Kamu: {user.uid}<br/>(Tambahkan UID ini ke collection &apos;admins&apos; di Firebase Console jika kamu adalah admin)</p>
-        <button onClick={() => signOut(auth)} className="px-6 py-2 border border-[#C4973A] text-[#C4973A] rounded hover:bg-[#C4973A] hover:text-black transition-colors">Logout</button>
+        <div className="bg-[#3A0A0A] p-8 rounded-lg border border-[#C4973A4D] shadow-xl max-w-md w-full">
+          <h1 className="text-xl text-red-400 font-bold mb-2">Akses Ditolak</h1>
+          <p className="text-sm text-[#F4EDE0]/90 mb-4 font-mono">
+            Email login: <span className="text-[#C4973A]">{user.email}</span>
+          </p>
+          <p className="text-xs text-[#F4EDE0]/70 mb-6 leading-relaxed">
+            Email ini tidak terdaftar sebagai Admin Kelas Utama.<br />
+            Pastikan kamu login menggunakan salah satu email berikut:<br />
+            1. <strong className="text-white">aghna1011@gmail.com</strong><br />
+            2. <strong className="text-white">ghinaayundiafairuzsosiologix1@gmail.com</strong>
+          </p>
+          <div className="flex gap-2">
+            <button onClick={login} className="flex-1 px-4 py-2 bg-[#C4973A] text-black font-bold text-xs uppercase tracking-wider rounded hover:bg-[#F4EDE0] transition-colors">
+              Ganti Akun Google
+            </button>
+            <button onClick={() => signOut(auth)} className="flex-1 px-4 py-2 border border-[#C4973A] text-[#C4973A] font-bold text-xs uppercase tracking-wider rounded hover:bg-red-950 transition-colors">
+              Logout
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
