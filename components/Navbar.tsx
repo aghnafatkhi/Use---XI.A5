@@ -40,7 +40,7 @@ export default function Navbar() {
           <div className="flex items-center space-x-3">
             <span className="font-instrument text-[24px] text-[#C4973A] italic leading-none transform translate-y-0.5">ε</span>
             <div className="w-[1px] h-4 bg-[#C4973A4D]"></div>
-            <span className="font-syne-mono text-[11px] text-[#3A0A0A] uppercase tracking-[0.2em]">XI IPA 5</span>
+            <span className="font-syne-mono text-[11px] text-[#3A0A0A] uppercase tracking-[0.2em]">XII IPA 5</span>
           </div>
 
           {/* Desktop Nav */}

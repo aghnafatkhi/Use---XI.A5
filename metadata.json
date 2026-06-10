@@ -1,6 +1,8 @@
 {
-  "name": "Use - XI.A5",
-  "description": "Website kenangan kelas XI IPA 5 SMAN 1 Cileungsi (2025/2026).",
+  "name": "Epsilonscience - XII.A5",
+  "description": "Website kenangan kelas XII IPA 5 SMAN 1 Cileungsi (2025/2026).",
   "requestFramePermissions": [],
-  "majorCapabilities": []
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }

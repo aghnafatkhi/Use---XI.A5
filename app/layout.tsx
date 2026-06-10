@@ -28,8 +28,8 @@ const satisfy = Satisfy({
 });
 
 export const metadata: Metadata = {
-  title: 'Epsilonscience XI IPA 5',
-  description: 'Website kenangan kelas XI IPA 5 SMAN 1 Cileungsi (2025/2026).',
+  title: 'Epsilonscience XII IPA 5',
+  description: 'Website kenangan kelas XII IPA 5 SMAN 1 Cileungsi (2025/2026).',
 };
 
 export default function RootLayout({children}: {children: React.ReactNode}) {

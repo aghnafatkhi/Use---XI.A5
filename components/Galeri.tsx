@@ -102,17 +102,17 @@ export default function Galeri() {
                 {/* Ratio padding */}
                 <div className={`${heightClass} w-full`}></div>
                 
-                {/* Background Gradient */}
+                {/* Background Image/Color */}
                 <div 
                   className="absolute inset-0 w-full h-full transition-transform duration-500 ease-out group-hover:scale-[1.03]"
                   style={{ background: item.bg?.startsWith('http') || item.bg?.startsWith('data:') ? `url(${item.bg}) center/cover no-repeat` : item.bg }}
                 >
-                  <div className="absolute inset-0 bg-[#3A0A0A]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-0"></div>
+                  <div className="absolute inset-0 bg-black/40 group-hover:bg-black/60 transition-colors duration-300 z-0"></div>
                   <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center z-10">
-                    <span className="font-syne font-bold text-[0.85rem] md:text-[1rem] text-[#F4EDE0] uppercase tracking-[0.1em] mb-2 drop-shadow-sm">
+                    <span className="font-syne font-bold text-[0.9rem] md:text-[1.1rem] text-[#F4EDE0] uppercase tracking-[0.1em] mb-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
                       {item.title}
                     </span>
-                    <span className="font-syne-mono text-[0.7rem] text-[#C4973A]/90 uppercase tracking-widest drop-shadow-sm">
+                    <span className="font-syne-mono text-[0.7rem] text-[#C4973A] uppercase tracking-widest drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
                       {item.category.replace('-', ' ')}
                     </span>
                   </div>

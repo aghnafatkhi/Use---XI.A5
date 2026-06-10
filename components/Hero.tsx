@@ -27,7 +27,7 @@ export default function Hero() {
           {/* Vertical Text */}
           <div className="absolute left-4 md:left-8 bottom-16 md:bottom-20 origin-bottom-left -rotate-90 sr-fade delay-5 hidden sm:block">
             <span className="font-syne font-black text-[9px] tracking-[0.4em] text-[#C4973A66] uppercase">
-              Epsilonscience 2025
+              Epsilonscience 2026
             </span>
           </div>
 
@@ -36,17 +36,17 @@ export default function Hero() {
             <div className="inline-flex items-center gap-3 border border-[#C4973A] px-3 py-1 mb-6 md:mb-8 w-fit sr-fade delay-3 z-10">
               <span className="font-instrument text-[#C4973A] text-sm italic">ε</span>
               <span className="font-syne-mono text-[10px] text-[#F4EDE0] tracking-[0.2em] uppercase">
-                Epsilonscience — XI IPA 5
+                Epsilonscience — XII IPA 5
               </span>
             </div>
 
             {/* Main Title */}
             <h1 className="flex flex-col m-0 p-0 leading-[0.85] mb-8 md:mb-10 z-10">
               <span className="font-instrument italic text-[clamp(3.5rem,8vw,6rem)] text-[#F4EDE0] leading-none m-0 block sr-up delay-4">
-                XI IPA 5
+                XII IPA 5
               </span>
               <span className="font-instrument italic text-[clamp(3rem,6vw,5rem)] text-[#C4973A] leading-none m-0 mt-2 block sr-up delay-5">
-                Angkatan 2025.
+                Angkatan 2026.
               </span>
             </h1>
 
@@ -55,7 +55,7 @@ export default function Hero() {
 
             {/* Subtitle */}
             <p className="font-syne font-medium italic text-base text-[#F4EDE099] max-w-sm leading-relaxed mb-10 md:mb-12 sr-up delay-5 z-10">
-              Sebuah dokumentasi perjalanan akademik dan kebersamaan siswa-siswi kelas XI IPA 5 SMAN 1 Cileungsi.
+              Sebuah dokumentasi perjalanan akademik dan kebersamaan siswa-siswi kelas XII IPA 5 SMAN 1 Cileungsi.
             </p>
 
             {/* Links */}

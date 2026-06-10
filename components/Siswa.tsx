@@ -19,7 +19,16 @@ export default function Siswa() {
     const q = firestoreQuery(collection(db, 'students'), orderBy('absen', 'asc'));
     const unsub = onSnapshot(q, (snap) => {
       if (!snap.empty) {
-        setStudents(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+        const fromDb = snap.docs.map(doc => ({ id: doc.id, ...doc.data() as any }));
+        if (snap.size >= 30) {
+          setStudents(fromDb);
+        } else {
+          const merged = staticStudents.map(staticS => {
+            const dbS = fromDb.find(s => s.absen === staticS.absen);
+            return dbS ? { ...staticS, ...dbS } : staticS;
+          });
+          setStudents(merged);
+        }
       } else {
         setStudents(staticStudents);
       }
@@ -138,7 +147,7 @@ export default function Siswa() {
                        </div>
                        
                        <p className="font-instrument italic text-[0.85rem] md:text-[0.95rem] text-[#F4EDE0]/90 leading-[1.4] flex-1">
-                         &quot;{s.quote || 'Tercatat pada database akademik kelas XI IPA 5 periode ajaran ini.'}&quot;
+                         &quot;{s.quote || 'Tercatat pada database akademik kelas XII IPA 5 periode ajaran ini.'}&quot;
                        </p>
 
                        <span className="font-syne-mono text-[0.6rem] md:text-[0.65rem] text-[#C4973A]/50 mt-auto tracking-widest text-center">ARSIP SISWA • EPSILON</span>

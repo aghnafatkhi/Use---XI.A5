@@ -29,7 +29,7 @@ export default function Footer() {
           <div className="relative z-10 flex flex-col">
             <span className="font-satisfy text-[1.8rem] text-[#F4EDE0] mb-2">Epsilonscience</span>
             <span className="font-syne-mono text-[0.7rem] text-[#F4EDE0]/40 tracking-[0.1em] uppercase">
-              Xi IPA 5 · SMAN 1 Cileungsi · 2025/2026
+              XII IPA 5 · SMAN 1 Cileungsi · 2025/2026
             </span>
           </div>
         </div>

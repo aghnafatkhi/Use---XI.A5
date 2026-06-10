@@ -8,7 +8,7 @@ export default function Struktur() {
           05 — Susunan Organisasi
         </span>
         <h2 className="font-instrument italic text-[3rem] md:text-[3.5rem] text-[#F4EDE0] leading-[1.1] mb-6 whitespace-pre-line">
-          {"Struktur Kepengurusan\nKelas XI IPA 5."}
+          {"Struktur Kepengurusan\nKelas XII IPA 5."}
         </h2>
         <p className="font-syne text-[0.9rem] md:text-[1rem] text-[#F4EDE0]/50 max-w-md mx-auto">
           Susunan fungsional yang mendukung keberlangsungan operasional kelas sepanjang periode akademis.
@@ -24,12 +24,12 @@ export default function Struktur() {
         {/* Vertical line down */}
         <div className="w-[1px] h-[40px] md:h-[50px] bg-[#C4973A]/30 sr-fade"></div>
 
-        <Node label="Ketua Kelas" name="Abyan Dzaky Pratama" />
+        <Node label="Ketua Kelas" name="Alisha Putri Vallena Haris" />
 
         {/* Vertical line down */}
         <div className="w-[1px] h-[40px] md:h-[50px] bg-[#C4973A]/30 sr-fade delay-1"></div>
 
-        <Node label="Wakil Ketua" name="Adinda Putri Rahayu" />
+        <Node label="Wakil Ketua" name="Octaviana Sintya Mardiyanti" />
 
         {/* Split line */}
         <div className="w-[1px] h-[30px] md:h-[40px] bg-[#C4973A]/30 sr-fade delay-2"></div>
@@ -43,12 +43,37 @@ export default function Struktur() {
           <div className="absolute left-[87.5%] top-0 w-[1px] h-[30px] md:h-[40px] bg-[#C4973A]/30"></div>
         </div>
 
-        {/* Level 3 nodes */}
-        <div className="w-full grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 px-2">
-          <SmallNode label="Sekretaris 1" name="Aghna Nur Fadhilah" />
-          <SmallNode label="Sekretaris 2" name="Annisa Farah Diba" />
-          <SmallNode label="Bendahara 1" name="Aisha Nuraini" />
-          <SmallNode label="Bendahara 2" name="Dea Amelia Putri" />
+        {/* Level 3 & 4 Container wrapper */}
+        <div className="w-full relative">
+          {/* Center vertical line passing through Level 3 to connect Level 4 */}
+          <div className="absolute left-1/2 top-[-30px] md:top-[-40px] w-[1px] h-[calc(100%+60px)] md:h-[calc(100%+80px)] bg-[#C4973A]/30 -translate-x-1/2 -z-10"></div>
+
+          {/* Level 3 nodes */}
+          <div className="w-full grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 px-2">
+            <SmallNode label="Sekretaris 1" name="Diandra Pravita Nurani" />
+            <SmallNode label="Sekretaris 2" name="Zahratusita Sumitra" />
+            <SmallNode label="Bendahara 1" name="Novailla Salwa Khoirunisa" />
+            <SmallNode label="Bendahara 2" name="Salma Tazkiyyatul Aqwal" />
+          </div>
+
+          <div className="w-[1px] h-[30px] md:h-[40px]"></div>
+
+          {/* Horizontal connect container Level 4 */}
+          <div className="w-[80%] md:w-[85%] mx-auto border-t border-[#C4973A]/30 flex justify-between relative h-[30px] md:h-[40px] sr-fade delay-3">
+            <div className="absolute left-[16.6%] top-0 w-[1px] h-[30px] md:h-[40px] bg-[#C4973A]/30"></div>
+            <div className="absolute left-[50%] top-0 w-[1px] h-[30px] md:h-[40px] bg-[#C4973A]/30"></div>
+            <div className="absolute left-[83.3%] top-0 w-[1px] h-[30px] md:h-[40px] bg-[#C4973A]/30"></div>
+          </div>
+
+          {/* Level 4 nodes */}
+          <div className="w-full grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 px-2">
+            <SmallNode label="Seksi Pendidikan" name={["Axelizar Achmad", "Ghina Ayundia Fairuz"]} />
+            <SmallNode label="Seksi Upacara / Keamanan" name={["Asyifa Khoerunnisa", "Raffiendra Ghazan Ari Nugroho"]} />
+            <SmallNode label="Seksi Kebersihan" name={["Christian Jhosua Halomoan Hutabarat", "Maura Esther Tiara Hartana"]} />
+            <SmallNode label="Seksi Kerohanian" name={["Rasendriya Bhamakerti", "Nafisha Putri Radisty"]} />
+            <SmallNode label="Seksi Olahraga / Kesehatan" name={["Dimas Alfarizky", "Adam Mudzaki"]} />
+            <SmallNode label="Seksi Peralatan" name={["Muhammad Vicky Wiraputra", "Hanzhalah Abdurrahman Al Fayyad"]} />
+          </div>
         </div>
 
       </div>
@@ -66,11 +91,19 @@ function Node({label, name, sub}: {label:string, name:string, sub?:string}) {
   )
 }
 
-function SmallNode({label, name}: {label:string, name:string}) {
+function SmallNode({label, name}: {label:string, name:string | string[]}) {
+  const names = Array.isArray(name) ? name : [name];
   return (
-    <div className="bg-[#C4973A]/5 border border-[#C4973A]/20 border-t-2 border-t-[#C4973A]/60 rounded-[4px] p-4 md:p-5 text-center z-10 sr-up delay-3 hover:bg-[#C4973A]/10 transition-colors">
-      <span className="block font-syne-mono text-[0.6rem] md:text-[0.65rem] text-[#C4973A]/80 uppercase tracking-widest mb-1">{label}</span>
-      <h3 className="font-syne font-bold text-[0.8rem] md:text-[0.9rem] text-[#F4EDE0] leading-tight">{name}</h3>
+    <div className="bg-[#C4973A]/5 border border-[#C4973A]/20 border-t-2 border-t-[#C4973A]/60 rounded-[4px] p-4 md:p-5 text-center z-10 sr-up delay-3 hover:bg-[#C4973A]/10 transition-colors flex flex-col justify-center h-full">
+      <span className="block font-syne-mono text-[0.6rem] md:text-[0.65rem] text-[#C4973A]/80 uppercase tracking-widest mb-2">{label}</span>
+      <div className="flex flex-col gap-2">
+        {names.map((n, i) => (
+          <div key={i}>
+            {i > 0 && <div className="w-8 h-[1px] bg-[#C4973A]/20 mx-auto my-2"></div>}
+            <h3 className="font-syne font-bold text-[0.8rem] md:text-[0.9rem] text-[#F4EDE0] leading-tight">{n}</h3>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

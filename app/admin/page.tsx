@@ -53,6 +53,8 @@ export default function AdminPage() {
   const [galleryImages, setGalleryImages] = useState<string[]>([]);
   const [isCompressing, setIsCompressing] = useState(false);
 
+  const hasOldStudents = students.some(s => s.name === 'Abyan Dzaky Pratama' || s.name === 'Adinda Putri Rahayu');
+
   const compressImage = (file: File, maxWidth = 1200, maxHeight = 1200, quality = 0.8): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -119,8 +121,51 @@ export default function AdminPage() {
     const unsubGal = onSnapshot(firestoreQuery(collection(db, 'gallery'), orderBy('createdAt', 'desc')), (snap) => {
       setGalleries(snap.docs.map(d => ({ id: d.id, ...d.data() })));
     });
-    const unsubSis = onSnapshot(firestoreQuery(collection(db, 'students'), orderBy('absen', 'asc')), (snap) => {
-      setStudents(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    const unsubSis = onSnapshot(firestoreQuery(collection(db, 'students'), orderBy('absen', 'asc')), async (snap) => {
+      const dbStudents = snap.docs.map(d => ({ id: d.id, ...d.data() })) as any[];
+      setStudents(dbStudents);
+
+      const oldCheck = dbStudents.some(s => 
+        s.name === 'Abyan Dzaky Pratama' || 
+        s.name === 'Adinda Putri Rahayu' || 
+        s.name === 'Aghna Fatkhi Putra Buono' || 
+        s.name === 'Kevin Caresto Gisella.S' || 
+        s.name === 'Rasendria Bhamakerti'
+      );
+      const rolesOutOfSync = dbStudents.some(dbS => {
+        const staticS = staticStudents.find(s => s.absen === dbS.absen);
+        return staticS && staticS.role !== dbS.role;
+      });
+      if (dbStudents.length > 0 && (oldCheck || dbStudents.length < 30 || rolesOutOfSync)) {
+        try {
+          const batch = writeBatch(db);
+          dbStudents.forEach(s => {
+            if (s.id) {
+              batch.delete(doc(db, 'students', s.id));
+            }
+          });
+          staticStudents.forEach(item => {
+            const newDoc = doc(collection(db, 'students'));
+            batch.set(newDoc, item);
+          });
+          await batch.commit();
+          console.log('Auto Sync: Successfully updated database with the new XII IPA 5 student roster.');
+        } catch (err) {
+          console.error('Auto Sync Error:', err);
+        }
+      } else if (snap.empty) {
+        try {
+          const batch = writeBatch(db);
+          staticStudents.forEach(item => {
+            const newDoc = doc(collection(db, 'students'));
+            batch.set(newDoc, item);
+          });
+          await batch.commit();
+          console.log('Auto Sync: Seeded database with the new XII IPA 5 student roster.');
+        } catch (err) {
+          console.error('Auto Seed Error:', err);
+        }
+      }
     });
     const unsubMem = onSnapshot(firestoreQuery(collection(db, 'memories'), orderBy('order', 'asc')), (snap) => {
       setMemories(snap.docs.map(d => ({ id: d.id, ...d.data() })));
@@ -144,17 +189,35 @@ export default function AdminPage() {
   };
 
   const seedStudents = async () => {
-    if (!confirm('Impor data warga kelas awal?')) return;
+    const isOverwrite = students.length > 0;
+    const confirmMsg = isOverwrite 
+      ? 'Peringatan: Tindakan ini akan menghapus semua anggota kelas saat ini di database dan menyinkronkan ulang dengan daftar absen baru (XII IPA 5 - 36 Siswa). Lanjutkan?'
+      : 'Impor data anggota kelas awal (XII IPA 5 - 36 Siswa)?';
+    
+    if (!confirm(confirmMsg)) return;
     try {
       const batch = writeBatch(db);
+      
+      // Clear existing records if overwriting
+      if (isOverwrite) {
+        students.forEach(s => {
+          if (s.id) {
+            batch.delete(doc(db, 'students', s.id));
+          }
+        });
+      }
+      
+      // Add all static students
       staticStudents.forEach(item => {
         const newDoc = doc(collection(db, 'students'));
         batch.set(newDoc, item);
       });
+      
       await batch.commit();
-      alert('Data warga kelas berhasil diimpor!');
+      alert('Daftar anggota kelas berhasil disinkronkan ke database!');
     } catch (err) {
       console.error(err);
+      alert('Gagal menyinkronkan data anggota kelas.');
     }
   };
 
@@ -315,46 +378,44 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#130606] text-[#F4EDE0] p-8">
+    <div className="min-h-screen bg-[#130606] text-[#F4EDE0] p-4 md:p-8">
       <div className="max-w-5xl mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-center mb-10 pb-4 border-b border-[#C4973A33]">
-          <h1 className="text-3xl font-instrument italic text-[#C4973A] mb-4 md:mb-0">EPSILON Admin Panel</h1>
-          <div className="flex items-center space-x-6">
-            <Link href="/" className="text-sm uppercase tracking-widest text-[#F4EDE0]/70 hover:text-[#C4973A]">Kembali ke Web</Link>
-            <button onClick={() => signOut(auth)} className="text-sm uppercase tracking-widest text-[#F4EDE0]/70 hover:text-[#C4973A]">Logout</button>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 md:mb-10 pb-4 border-b border-[#C4973A33]">
+          <h1 className="text-2xl md:text-3xl font-instrument italic text-[#C4973A] mb-4 md:mb-0">Panel Admin XI.A5</h1>
+          <div className="flex items-center space-x-4 md:space-x-6">
+            <Link href="/" className="text-[10px] md:text-sm uppercase tracking-widest text-[#F4EDE0]/70 hover:text-[#C4973A]">Kembali ke Web</Link>
+            <button onClick={() => signOut(auth)} className="text-[10px] md:text-sm uppercase tracking-widest text-[#F4EDE0]/70 hover:text-[#C4973A]">Logout</button>
           </div>
         </div>
 
-        <div className="flex space-x-4 mb-8">
-          <button onClick={() => setActiveTab('gallery')} className={`px-4 py-2 font-syne uppercase text-sm ${activeTab === 'gallery' ? 'bg-[#C4973A] text-black font-bold' : 'bg-[#3A0A0A] text-[#F4EDE0] border border-[#C4973A4D] hover:border-[#C4973A]'}`}>Gallery</button>
-          <button onClick={() => setActiveTab('siswa')} className={`px-4 py-2 font-syne uppercase text-sm ${activeTab === 'siswa' ? 'bg-[#C4973A] text-black font-bold' : 'bg-[#3A0A0A] text-[#F4EDE0] border border-[#C4973A4D] hover:border-[#C4973A]'}`}>Warga Kelas</button>
-          <button onClick={() => setActiveTab('memories')} className={`px-4 py-2 font-syne uppercase text-sm ${activeTab === 'memories' ? 'bg-[#C4973A] text-black font-bold' : 'bg-[#3A0A0A] text-[#F4EDE0] border border-[#C4973A4D] hover:border-[#C4973A]'}`}>Catatan Perjalanan</button>
+        <div className="flex overflow-x-auto pb-2 mb-8 no-scrollbar md:space-x-4 gap-3">
+          <button onClick={() => setActiveTab('gallery')} className={`whitespace-nowrap px-4 py-2 font-syne uppercase text-[10px] md:text-sm flex-shrink-0 ${activeTab === 'gallery' ? 'bg-[#C4973A] text-black font-bold' : 'bg-[#3A0A0A] text-[#F4EDE0] border border-[#C4973A4D] hover:border-[#C4973A]'}`}>Gallery</button>
+          <button onClick={() => setActiveTab('siswa')} className={`whitespace-nowrap px-4 py-2 font-syne uppercase text-[10px] md:text-sm flex-shrink-0 ${activeTab === 'siswa' ? 'bg-[#C4973A] text-black font-bold' : 'bg-[#3A0A0A] text-[#F4EDE0] border border-[#C4973A4D] hover:border-[#C4973A]'}`}>Anggota Kelas</button>
+          <button onClick={() => setActiveTab('memories')} className={`whitespace-nowrap px-4 py-2 font-syne uppercase text-[10px] md:text-sm flex-shrink-0 ${activeTab === 'memories' ? 'bg-[#C4973A] text-black font-bold' : 'bg-[#3A0A0A] text-[#F4EDE0] border border-[#C4973A4D] hover:border-[#C4973A]'}`}>Catatan Perjalanan</button>
         </div>
 
         {activeTab === 'gallery' && (
           <section className="mb-12">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-syne font-bold uppercase tracking-widest text-[#C4973A]">Manage Gallery</h2>
-              {galleries.length === 0 && (
-                <button onClick={seedGallery} className="text-xs border border-[#C4973A] px-3 py-1 rounded text-[#C4973A] hover:bg-[#C4973A] hover:text-black transition-all">Impor Data Awal</button>
-              )}
-            </div>
-            <form onSubmit={handleGalleryCreate} className="flex flex-col gap-6 mb-8 bg-[#3A0A0A] p-6 rounded-lg border border-[#C4973A33]">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div 
-                    onDragOver={(e) => e.preventDefault()}
-                    onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer.files[0]; if(f) handleFile(f); }}
-                    className="border-2 border-dashed border-[#C4973A4D] rounded-lg h-48 flex flex-col items-center justify-center relative overflow-hidden group hover:border-[#C4973A] transition-colors cursor-pointer"
-                    onClick={() => document.getElementById('file-input')?.click()}
-                  >
+                  <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-lg md:text-xl font-syne font-bold uppercase tracking-widest text-[#C4973A]">Manage Gallery</h2>
+                    {galleries.length === 0 && (
+                      <button onClick={seedGallery} className="text-[10px] md:text-xs border border-[#C4973A] px-2 md:px-3 py-1 rounded text-[#C4973A] hover:bg-[#C4973A] hover:text-black transition-all">Impor Data Awal</button>
+                    )}
+                  </div>
+                  <form onSubmit={handleGalleryCreate} className="flex flex-col gap-4 md:gap-6 mb-8 bg-[#3A0A0A] p-4 md:p-6 rounded-lg border border-[#C4973A33]">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                      <div className="space-y-4">
+                        <div 
+                          onDragOver={(e) => e.preventDefault()}
+                          onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer.files[0]; if(f) handleFile(f); }}
+                          className="border-2 border-dashed border-[#C4973A4D] rounded-lg h-32 md:h-48 flex flex-col items-center justify-center relative overflow-hidden group hover:border-[#C4973A] transition-colors cursor-pointer"
+                          onClick={() => document.getElementById('file-input')?.click()}
+                        >
                     {isCompressing ? (
                       <div className="flex flex-col items-center animate-pulse">
                         <div className="w-8 h-8 border-2 border-[#C4973A] border-t-transparent rounded-full animate-spin mb-2"></div>
                         <span className="text-[10px] font-syne uppercase tracking-widest text-[#C4973A]">Memproses...</span>
                       </div>
-                    ) : preview ? (
-                      <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${preview})` }}></div>
                     ) : (
                       <>
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[#C4973A] mb-2 opacity-50 group-hover:opacity-100 transition-opacity">
@@ -362,8 +423,8 @@ export default function AdminPage() {
                           <polyline points="17 8 12 3 7 8"></polyline>
                           <line x1="12" y1="3" x2="12" y2="15"></line>
                         </svg>
-                        <span className="text-xs font-syne uppercase tracking-widest text-[#C4973A80]">Drag & Drop High Quality Image</span>
-                        <span className="text-[10px] text-[#F4EDE04D] mt-1">Atau klik untuk memilih file</span>
+                        <span className="text-xs font-syne uppercase tracking-widest text-[#C4973A80]">Upload Gambar</span>
+                        <span className="text-[9px] text-[#F4EDE04D] mt-1 text-center px-4">Bisa pilih banyak sekaligus atau satu per satu</span>
                       </>
                     )}
                     <input id="file-input" type="file" accept="image/*" multiple className="hidden" onChange={(e) => { 
@@ -375,13 +436,24 @@ export default function AdminPage() {
                     <input type="hidden" name="bg" value={galleryImages[0] || ''} />
                   </div>
                   {galleryImages.length > 0 && (
-                    <div className="flex flex-wrap gap-2">
-                       {galleryImages.map((img, i) => (
-                         <div key={i} className="relative w-12 h-12 bg-cover bg-center rounded" style={{ backgroundImage: `url(${img})` }}>
-                           <button onClick={(e) => { e.stopPropagation(); setGalleryImages(prev => prev.filter((_, idx) => idx !== i)); }} className="absolute -top-1 -right-1 bg-red-600 text-[8px] p-0.5 rounded-full">×</button>
-                         </div>
-                       ))}
-                       <button type="button" onClick={() => setGalleryImages([])} className="text-[10px] text-red-400 hover:underline">Clear All</button>
+                    <div className="bg-[#180808] p-3 rounded border border-[#C4973A33]">
+                      <p className="text-[10px] uppercase font-syne tracking-widest text-[#C4973A] mb-3">Antrean Gambar ({galleryImages.length})</p>
+                      <div className="flex flex-wrap gap-3">
+                         {galleryImages.map((img, i) => (
+                           <div key={i} className="relative w-16 h-16 bg-cover bg-center rounded border border-[#C4973A4D]" style={{ backgroundImage: `url(${img})` }}>
+                             {i === 0 && (
+                               <div className="absolute -bottom-1 -left-1 bg-[#C4973A] text-black text-[7px] font-bold px-1 rounded uppercase">Utama</div>
+                             )}
+                             <button type="button" onClick={() => setGalleryImages(prev => prev.filter((_, idx) => idx !== i))} className="absolute -top-2 -right-2 bg-red-600 text-white w-5 h-5 flex items-center justify-center rounded-full text-xs shadow-lg">×</button>
+                           </div>
+                         ))}
+                         {galleryImages.length > 0 && (
+                           <button type="button" onClick={() => setGalleryImages([])} className="flex flex-col items-center justify-center w-16 h-16 border border-dashed border-red-900/50 rounded text-red-400 hover:bg-red-900/10 transition-colors" title="Hapus Semua">
+                             <span className="text-[8px] uppercase font-bold">Reset</span>
+                           </button>
+                         )}
+                      </div>
+                      <p className="text-[9px] text-[#F4EDE04D] mt-3 italic">* Gambar pertama otomatis menjadi sampul (background).</p>
                     </div>
                   )}
                 </div>
@@ -404,14 +476,14 @@ export default function AdminPage() {
               {galleries.map(g => (
                 <div key={g.id} className="relative aspect-[4/5] overflow-hidden group rounded-lg border border-[#C4973A4D]">
                   <div className="absolute inset-0 bg-cover bg-center" style={{ background: g.bg.startsWith('http') || g.bg.startsWith('data:') ? `url(${g.bg}) center/cover no-repeat` : g.bg }}></div>
-                  <div className="absolute inset-0 bg-black/50 p-4 flex flex-col justify-between opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="absolute inset-0 bg-black/60 p-4 flex flex-col justify-between opacity-0 group-hover:opacity-100 transition-opacity">
                     <div className="flex justify-between items-start">
                       <button onClick={() => { setEditingGallery(g); setGalleryImages(g.images || []); setPreview(g.bg); setActiveTab('gallery'); window.scrollTo(0,0); }} className="bg-[#C4973A] text-black px-3 py-1 text-xs rounded hover:bg-[#F4EDE0] font-bold">Edit</button>
                       <button onClick={() => deleteDocItem('gallery', g.id)} className="bg-red-900/80 text-white px-3 py-1 text-xs rounded hover:bg-red-600">Hapus</button>
                     </div>
-                    <div>
-                      <div className="text-[#C4973A] text-[10px] uppercase font-syne mb-1">{g.category}</div>
-                      <div className="text-sm font-instrument italic">{g.title}</div>
+                    <div className="drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                      <div className="text-[#C4973A] text-[10px] uppercase font-syne mb-1 font-bold">{g.category}</div>
+                      <div className="text-sm font-instrument italic text-white">{g.title}</div>
                     </div>
                   </div>
                 </div>
@@ -422,48 +494,60 @@ export default function AdminPage() {
 
         {activeTab === 'siswa' && (
           <section className="mb-12">
+            {hasOldStudents && (
+              <div className="bg-amber-950/80 border border-amber-600/50 p-4 rounded-lg mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                  <h3 className="text-amber-400 font-bold font-syne text-sm uppercase">Absen Kelas Lama Terdeteksi!</h3>
+                  <p className="text-xs text-[#F4EDE0]/80 mt-1">Sistem mendeteksi data anggota kelas di database masih menggunakan data lama (XI IPA 5). Silakan klik tombol di samping untuk menyinkronkan ke absen resmi baru (XII IPA 5).</p>
+                </div>
+                <button onClick={seedStudents} className="bg-amber-600 hover:bg-amber-500 text-black font-extrabold uppercase tracking-widest text-[11px] px-4 py-2 rounded transition-all whitespace-nowrap">
+                  Sinkronkan Baru Sekarang
+                </button>
+              </div>
+            )}
+
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-syne font-bold uppercase tracking-widest text-[#C4973A]">Manage Warga Kelas</h2>
-              {students.length === 0 && (
-                <button onClick={seedStudents} className="text-xs border border-[#C4973A] px-3 py-1 rounded text-[#C4973A] hover:bg-[#C4973A] hover:text-black transition-all">Impor Data Awal</button>
-              )}
+              <h2 className="text-xl font-syne font-bold uppercase tracking-widest text-[#C4973A]">Manage Anggota Kelas ({students.length})</h2>
+              <button onClick={seedStudents} className="text-xs border border-[#C4973A] px-3 py-1 rounded text-[#C4973A] hover:bg-[#C4973A] hover:text-black transition-all">
+                {students.length === 0 ? 'Impor Data Awal' : 'Reset & Sync Absen Baru'}
+              </button>
             </div>
-            <form onSubmit={addStudent} className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8 bg-[#3A0A0A] p-6 rounded-lg border border-[#C4973A33]">
-              <input required name="absen" defaultValue={editingStudent?.absen || ''} placeholder="No Absen (e.g. 01)" className="bg-[#180808] p-2 rounded text-[#F4EDE0] text-sm border border-transparent focus:border-[#C4973A] outline-none" />
-              <input required name="name" defaultValue={editingStudent?.name || ''} placeholder="Nama Lengkap" className="bg-[#180808] p-2 rounded text-[#F4EDE0] text-sm border border-transparent focus:border-[#C4973A] outline-none" />
-              <input name="role" defaultValue={editingStudent?.role || ''} placeholder="Jabatan (Opsional)" className="bg-[#180808] p-2 rounded text-[#F4EDE0] text-sm border border-transparent focus:border-[#C4973A] outline-none" />
-              <input name="quote" defaultValue={editingStudent?.quote || ''} placeholder="Kutipan/Quote" className="bg-[#180808] p-2 rounded text-[#F4EDE0] text-sm border border-transparent focus:border-[#C4973A] outline-none" />
+            <form onSubmit={addStudent} className="flex flex-col md:grid md:grid-cols-5 gap-4 mb-8 bg-[#3A0A0A] p-4 md:p-6 rounded-lg border border-[#C4973A33]">
+              <input required name="absen" defaultValue={editingStudent?.absen || ''} placeholder="No Absen (e.g. 01)" className="bg-[#180808] p-3 md:p-2 rounded text-[#F4EDE0] text-sm border border-transparent focus:border-[#C4973A] outline-none w-full" />
+              <input required name="name" defaultValue={editingStudent?.name || ''} placeholder="Nama Lengkap" className="bg-[#180808] p-3 md:p-2 rounded text-[#F4EDE0] text-sm border border-transparent focus:border-[#C4973A] outline-none w-full" />
+              <input name="role" defaultValue={editingStudent?.role || ''} placeholder="Jabatan (Opsional)" className="bg-[#180808] p-3 md:p-2 rounded text-[#F4EDE0] text-sm border border-transparent focus:border-[#C4973A] outline-none w-full" />
+              <input name="quote" defaultValue={editingStudent?.quote || ''} placeholder="Kutipan/Quote" className="bg-[#180808] p-3 md:p-2 rounded text-[#F4EDE0] text-sm border border-transparent focus:border-[#C4973A] outline-none w-full" />
               <div className="flex gap-2">
-                <button type="submit" className="flex-1 bg-[#C4973A] text-black font-bold uppercase tracking-wider rounded text-sm hover:bg-[#F4EDE0] transition-colors">
+                <button type="submit" className="flex-1 bg-[#C4973A] text-black font-bold uppercase tracking-wider rounded text-sm py-3 md:py-0 hover:bg-[#F4EDE0] transition-colors">
                   {editingStudent ? 'Simpan' : 'Tambah'}
                 </button>
                 {editingStudent && (
-                  <button type="button" onClick={() => setEditingStudent(null)} className="px-3 bg-red-900 rounded text-white text-xs">×</button>
+                  <button type="button" onClick={() => setEditingStudent(null)} className="px-4 md:px-3 bg-red-900 rounded text-white text-xs">×</button>
                 )}
               </div>
             </form>
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm text-[#F4EDE0]">
-                <thead className="bg-[#3A0A0A] text-[#C4973A]">
+            <div className="overflow-x-auto no-scrollbar">
+              <table className="w-full text-left text-xs md:text-sm text-[#F4EDE0] border-collapse">
+                <thead className="bg-[#3A0A0A] text-[#C4973A] uppercase tracking-wider text-[10px] md:text-xs">
                   <tr>
-                    <th className="p-3">Absen</th>
-                    <th className="p-3">Nama Lengkap</th>
-                    <th className="p-3">Jabatan</th>
-                    <th className="p-3">Quote</th>
-                    <th className="p-3 text-right">Aksi</th>
+                    <th className="p-2 md:p-3">No</th>
+                    <th className="p-2 md:p-3">Nama</th>
+                    <th className="p-2 md:p-3">Peran</th>
+                    <th className="p-2 md:p-3">Quote</th>
+                    <th className="p-2 md:p-3 text-right">Aksi</th>
                   </tr>
                 </thead>
                 <tbody>
                   {students.map(s => (
-                    <tr key={s.id} className="border-b border-[#3A0A0A]">
-                      <td className="p-3 text-[#C4973A] font-syne-mono">{s.absen}</td>
-                      <td className="p-3">{s.name}</td>
-                      <td className="p-3">{s.role || '-'}</td>
-                      <td className="p-3 italic text-xs text-[#F4EDE0]/60 max-w-[200px] truncate">{s.quote || '-'}</td>
-                      <td className="p-3 text-right space-x-3">
-                        <button onClick={() => { setEditingStudent(s); window.scrollTo(0,0); }} className="text-[#C4973A] hover:underline uppercase text-xs tracking-wider">Edit</button>
-                        <button onClick={() => deleteDocItem('students', s.id)} className="text-red-400 hover:text-red-300 uppercase text-xs tracking-wider">Hapus</button>
+                    <tr key={s.id} className="border-b border-[#3A0A0A] hover:bg-[#3A0A0A]/30 transition-colors">
+                      <td className="p-2 md:p-3 text-[#C4973A] font-syne-mono">{s.absen}</td>
+                      <td className="p-2 md:p-3 font-bold md:font-normal whitespace-nowrap">{s.name}</td>
+                      <td className="p-2 md:p-3 opacity-70 whitespace-nowrap">{s.role || '-'}</td>
+                      <td className="p-2 md:p-3 italic text-[10px] text-[#F4EDE0]/60 max-w-[120px] md:max-w-[200px] truncate">{s.quote || '-'}</td>
+                      <td className="p-2 md:p-3 text-right space-x-2 md:space-x-3 whitespace-nowrap">
+                        <button onClick={() => { setEditingStudent(s); window.scrollTo(0,0); }} className="text-[#C4973A] hover:underline uppercase text-[10px] md:text-xs tracking-wider font-bold">Edit</button>
+                        <button onClick={() => deleteDocItem('students', s.id)} className="text-red-400 hover:text-red-300 uppercase text-[10px] md:text-xs tracking-wider font-bold">Hapus</button>
                       </td>
                     </tr>
                   ))}
@@ -479,18 +563,18 @@ export default function AdminPage() {
         {activeTab === 'memories' && (
           <section className="mb-12">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-syne font-bold uppercase tracking-widest text-[#C4973A]">Manage Catatan Perjalanan</h2>
+              <h2 className="text-lg md:text-xl font-syne font-bold uppercase tracking-widest text-[#C4973A]">Manage Catatan Perjalanan</h2>
               {memories.length === 0 && (
-                <button onClick={seedMemories} className="text-xs border border-[#C4973A] px-3 py-1 rounded text-[#C4973A] hover:bg-[#C4973A] hover:text-black transition-all">Impor Data Awal</button>
+                <button onClick={seedMemories} className="text-[10px] md:text-xs border border-[#C4973A] px-2 md:px-3 py-1 rounded text-[#C4973A] hover:bg-[#C4973A] hover:text-black transition-all">Impor Data Awal</button>
               )}
             </div>
-            <form onSubmit={addMemory} className="flex flex-col gap-6 mb-8 bg-[#3A0A0A] p-6 rounded-lg border border-[#C4973A33]">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <form onSubmit={addMemory} className="flex flex-col gap-4 md:gap-6 mb-8 bg-[#3A0A0A] p-4 md:p-6 rounded-lg border border-[#C4973A33]">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                 <div className="space-y-4">
                   <div 
                     onDragOver={(e) => e.preventDefault()}
                     onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer.files[0]; if(f) handleFile(f); }}
-                    className="border-2 border-dashed border-[#C4973A4D] rounded-lg h-48 flex flex-col items-center justify-center relative overflow-hidden group hover:border-[#C4973A] transition-colors cursor-pointer"
+                    className="border-2 border-dashed border-[#C4973A4D] rounded-lg h-32 md:h-48 flex flex-col items-center justify-center relative overflow-hidden group hover:border-[#C4973A] transition-colors cursor-pointer"
                     onClick={() => document.getElementById('memory-file')?.click()}
                   >
                     {isCompressing ? (

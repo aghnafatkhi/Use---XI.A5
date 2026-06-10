@@ -18,7 +18,7 @@ export default function Manifesto() {
         <div className="w-full md:w-[40%] relative space-y-4 md:space-y-6 sr-up md:pr-10">
           <p className="text-[10px] font-black tracking-[0.2em] text-[#C4973A] uppercase">TENTANG KAMI</p>
           <h2 className="font-instrument italic text-[3rem] sm:text-[3.5rem] md:text-[4.5rem] text-[#3A0A0A] leading-[1.1] whitespace-pre-line">
-            {"Epsilonscience\nXI IPA 5"}
+            {"Epsilonscience\nXII IPA 5"}
           </h2>
         </div>
 
@@ -76,7 +76,7 @@ export default function Manifesto() {
         <div className="flex flex-row items-center gap-12 md:gap-16 w-full md:w-auto overflow-hidden">
           <div className="flex items-center gap-10 group">
             <span className="font-syne-mono text-[36px] md:text-[48px] text-[#C4973A] transition-colors group-hover:text-[#F4EDE0]">36</span>
-            <span className="text-[#F4EDE0CC] text-[11px] md:text-[12px] font-black tracking-widest uppercase max-w-[160px] leading-tight">Warga Kelas Terdaftar</span>
+            <span className="text-[#F4EDE0CC] text-[11px] md:text-[12px] font-black tracking-widest uppercase max-w-[160px] leading-tight">Anggota Kelas Terdaftar</span>
           </div>
         </div>
         
