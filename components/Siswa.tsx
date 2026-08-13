@@ -1,8 +1,64 @@
 import { useState, useEffect } from 'react';
 import { collection, onSnapshot, orderBy, query as firestoreQuery } from 'firebase/firestore';
 import { Search } from 'lucide-react';
-import { db } from '../lib/firebase';
+import { db, auth } from '../lib/firebase';
 import { staticStudents } from '../lib/constants';
+
+enum OperationType {
+  CREATE = 'create',
+  UPDATE = 'update',
+  DELETE = 'delete',
+  LIST = 'list',
+  GET = 'get',
+  WRITE = 'write',
+}
+
+interface FirestoreErrorInfo {
+  error: string;
+  operationType: OperationType;
+  path: string | null;
+  authInfo: {
+    userId?: string | null;
+    email?: string | null;
+    emailVerified?: boolean | null;
+    isAnonymous?: boolean | null;
+    tenantId?: string | null;
+    providerInfo?: {
+      providerId?: string | null;
+      email?: string | null;
+    }[];
+  }
+}
+
+function handleFirestoreError(error: any, operationType: OperationType, path: string | null) {
+  const errorMessage = error instanceof Error ? error.message : String(error);
+  const isPermissionDenied = errorMessage.toLowerCase().includes('permission-denied') || 
+                             errorMessage.toLowerCase().includes('insufficient permissions');
+
+  const errInfo: FirestoreErrorInfo = {
+    error: errorMessage,
+    authInfo: {
+      userId: auth.currentUser?.uid || null,
+      email: auth.currentUser?.email || null,
+      emailVerified: auth.currentUser?.emailVerified || null,
+      isAnonymous: auth.currentUser?.isAnonymous || null,
+      tenantId: auth.currentUser?.tenantId || null,
+      providerInfo: auth.currentUser?.providerData?.map(provider => ({
+        providerId: provider.providerId,
+        email: provider.email,
+      })) || []
+    },
+    operationType,
+    path
+  };
+
+  console.error('Firestore Error: ', JSON.stringify(errInfo));
+
+  // Throw structured exception only for authorization blocks so system logs can identify permission gaps
+  if (isPermissionDenied) {
+    throw new Error(JSON.stringify(errInfo));
+  }
+}
 
 // Helper to get initials
 const getInitials = (name: string) => {
@@ -17,7 +73,8 @@ export default function Siswa() {
   const [students, setStudents] = useState<any[]>(staticStudents);
 
   useEffect(() => {
-    const q = firestoreQuery(collection(db, 'students'), orderBy('absen', 'asc'));
+    const pathForOnSnapshot = 'students';
+    const q = firestoreQuery(collection(db, pathForOnSnapshot), orderBy('absen', 'asc'));
     const unsub = onSnapshot(q, (snap) => {
       if (!snap.empty) {
         const fromDb = snap.docs.map(doc => ({ id: doc.id, ...doc.data() as any }));
@@ -34,7 +91,7 @@ export default function Siswa() {
         setStudents(staticStudents);
       }
     }, (error) => {
-      console.error(error);
+      handleFirestoreError(error, OperationType.GET, pathForOnSnapshot);
     });
     return () => unsub();
   }, []);
@@ -88,10 +145,10 @@ export default function Siswa() {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-[2px] md:gap-[4px]">
             {filtered.map((s, index) => {
               const gradients = [
-                'linear-gradient(135deg, #1A3FBF 0%, #3D6EFF 100%)',
-                'linear-gradient(160deg, #0D1B4B 0%, #15329E 60%)',
-                'linear-gradient(110deg, #1C41C4 0%, #0A153D 100%)',
-                'linear-gradient(145deg, #FFD700 0%, #1A3FBF 100%)'
+                'linear-gradient(135deg, #0D1B4B 0%, #1A3FBF 100%)',
+                'linear-gradient(160deg, #050E2E 0%, #15329E 100%)',
+                'linear-gradient(110deg, #0A153D 0%, #1C41C4 100%)',
+                'linear-gradient(145deg, #081236 0%, #224ED2 100%)'
               ];
               const bg = gradients[index % gradients.length];
               const isFlipped = flipped === s.absen;
@@ -109,22 +166,26 @@ export default function Siswa() {
                    onKeyDown={(e) => { if (e.key === 'Enter') setFlipped(isFlipped ? null : s.absen); }}
                 >
                   <div className={`relative w-full h-full transition-transform duration-700 [transform-style:preserve-3d] ${isFlipped ? '[transform:rotateY(180deg)]' : ''}`}>
-                    
-                    {/* FRONT FACE */}
-                    <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] bg-[var(--bg-warm)] flex flex-col justify-between group-hover:shadow-[inset_0_-4px_0_0_#FFD700] transition-shadow duration-300">
-                       <div className="h-[100px] md:h-[120px] w-full relative" style={{background: bg}}>
-                          <div className="absolute bottom-[-28px] md:bottom-[-32px] left-1/2 -translate-x-1/2 w-14 h-14 md:w-16 md:h-16 rounded-full bg-cream/20 border-[2px] border-gold/60 flex items-center justify-center backdrop-blur-sm shadow-md">
-                            <span className="font-instrument italic text-[1.1rem] md:text-[1.3rem] text-white drop-shadow-md">{getInitials(s.name)}</span>
+                                      {/* FRONT FACE */}
+                    <div 
+                      className="absolute inset-0 w-full h-full [backface-visibility:hidden] [-webkit-backface-visibility:hidden] bg-[var(--bg-warm)] flex flex-col justify-between group-hover:shadow-[inset_0_-4px_0_0_#FFD700] transition-all duration-300 rounded-[2px]"
+                      style={{ transform: 'translate3d(0,0,0)' }}
+                    >
+                       <div className="h-[95px] md:h-[120px] w-full relative" style={{background: bg}}>
+                          <div className="absolute bottom-[-24px] md:bottom-[-32px] left-1/2 -translate-x-1/2 w-12 h-12 md:w-16 md:h-16 rounded-full bg-cream/20 border-[2px] border-gold/60 flex items-center justify-center backdrop-blur-sm shadow-md">
+                             <span className="font-instrument italic text-[1rem] md:text-[1.3rem] text-white drop-shadow-md select-none">{getInitials(s.name)}</span>
                           </div>
                        </div>
                        
-                       <div className="pt-[36px] md:pt-[44px] px-3 md:px-4 pb-4 md:pb-5 text-center flex-1 flex flex-col items-center">
-                          <h3 className="font-syne font-bold text-[0.8rem] md:text-[0.9rem] text-[var(--text-primary)] uppercase tracking-[0.02em] mb-1 line-clamp-2 leading-tight group-hover:text-maroon transition-colors">
-                            {s.name}
-                          </h3>
-                          <span className="font-syne-mono text-[0.65rem] md:text-[0.7rem] text-gold mb-2 font-bold">No. {s.absen}</span>
+                       <div className="pt-[32px] md:pt-[44px] px-3 md:px-4 pb-3 md:pb-5 text-center flex-1 flex flex-col items-center justify-between">
+                          <div className="w-full flex flex-col items-center">
+                            <h3 className="font-syne font-bold text-[0.75rem] md:text-[0.9rem] text-[var(--text-primary)] uppercase tracking-[0.02em] mb-1 line-clamp-2 leading-tight group-hover:text-maroon transition-colors">
+                              {s.name}
+                            </h3>
+                            <span className="font-syne-mono text-[0.6rem] md:text-[0.7rem] text-gold font-bold">No. {s.absen}</span>
+                          </div>
                           {s.role && (
-                            <span className="font-syne font-bold text-[0.55rem] md:text-[0.6rem] uppercase tracking-[0.05em] text-gold border border-gold px-2 py-[2px] rounded-full mt-auto bg-gold/5">
+                            <span className="font-syne font-bold text-[0.5rem] md:text-[0.6rem] uppercase tracking-[0.05em] text-gold border border-gold px-1.5 py-[1px] rounded-full mt-2 bg-gold/5 select-none">
                               {s.role}
                             </span>
                           )}
@@ -133,25 +194,30 @@ export default function Siswa() {
                     </div>
 
                     {/* BACK FACE */}
-                    <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)] bg-maroon p-5 flex flex-col shadow-inner">
-                       <div className="flex justify-between items-start mb-2">
-                          <span className="font-syne-mono text-[2rem] md:text-[2.5rem] text-gold/30 leading-none">{s.absen}</span>
-                          <span className="font-instrument italic text-white/30 text-2xl">ε</span>
+                    <div 
+                      className="absolute inset-0 w-full h-full [backface-visibility:hidden] [-webkit-backface-visibility:hidden] [transform:rotateY(180deg)] bg-dark-maroon flex flex-col justify-between overflow-hidden shadow-inner rounded-[2px]"
+                      style={{ transform: 'rotateY(180deg) translate3d(0,0,0)' }}
+                    >
+                       {/* Matching Top Gradient Block */}
+                       <div className="h-[95px] md:h-[120px] w-full relative px-4 pt-3 md:pt-4 flex justify-between items-start" style={{background: bg}}>
+                          <span className="font-syne-mono text-[1.4rem] md:text-[2.2rem] text-white/50 leading-none select-none">No. {s.absen}</span>
+                          <span className="font-instrument italic text-white/50 text-xl md:text-2xl select-none">ε</span>
                        </div>
-                       <h3 className="font-syne font-bold text-[0.85rem] md:text-[0.95rem] text-white uppercase mb-1 leading-snug">{s.name}</h3>
-                       {s.role && (
-                         <span className="font-syne text-[0.7rem] md:text-[0.75rem] text-gold font-bold tracking-wide">{s.role}</span>
-                       )}
-                       
-                       <div className="w-full h-[1px] bg-gold/20 my-4 md:my-5 relative">
-                          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-1 bg-gold rounded-full"></div>
-                       </div>
-                       
-                       <p className="font-instrument italic text-[0.85rem] md:text-[0.95rem] text-white/90 leading-[1.4] flex-1">
-                          &quot;{s.quote || 'Tercatat pada database akademik kelas XII.A5 periode ajaran ini.'}&quot;
-                       </p>
 
-                       <span className="font-syne-mono text-[0.6rem] md:text-[0.65rem] text-gold/50 mt-auto tracking-widest text-center">ARSIP SISWA • EPSILON</span>
+                       <div className="p-3.5 md:p-5 flex-1 flex flex-col justify-between">
+                          <div>
+                            <h3 className="font-syne font-bold text-[0.75rem] md:text-[0.95rem] text-white uppercase mb-1 leading-snug line-clamp-2">{s.name}</h3>
+                            {s.role && (
+                              <span className="font-syne text-[0.6rem] md:text-[0.75rem] text-gold font-bold tracking-wide uppercase select-none">{s.role}</span>
+                            )}
+                          </div>
+                          
+                          <p className="font-instrument italic text-[0.72rem] md:text-[0.9rem] text-white/90 leading-[1.4] my-2 line-clamp-3 select-text">
+                             &quot;{s.quote || 'Tercatat pada database akademik kelas XII.A5 periode ajaran ini.'}&quot;
+                          </p>
+
+                          <span className="font-syne-mono text-[0.5rem] md:text-[0.65rem] text-gold/40 tracking-widest text-center mt-auto select-none">ARSIP SISWA • EPSILON</span>
+                       </div>
                     </div>
 
                   </div>

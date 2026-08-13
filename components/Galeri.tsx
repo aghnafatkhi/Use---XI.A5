@@ -130,15 +130,20 @@ export default function Galeri() {
 
       {/* LIGHTBOX */}
       {lightboxIndex !== null && (
-        <div className="fixed inset-0 z-[2000] bg-[rgba(13,27,75,0.98)] flex flex-col items-center justify-center p-4 md:p-8" onClick={() => setLightboxIndex(null)}>
+        <div className="fixed inset-0 z-[2000] bg-[rgba(13,27,75,0.98)] flex flex-col items-center justify-center p-3 md:p-8" onClick={() => setLightboxIndex(null)}>
           <button 
-            className="absolute top-6 right-6 text-white/60 hover:text-gold font-syne text-[40px] leading-none focus-visible:outline-2 focus-visible:outline-gold transition-colors p-2 z-50"
+            className="absolute top-4 right-4 sm:top-6 sm:right-6 text-white/70 hover:text-gold transition-colors p-3 z-50 rounded-full hover:bg-white/10"
             onClick={(e) => { e.stopPropagation(); setLightboxIndex(null); }}
             aria-label="Close lightbox"
-          >×</button>
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
           
           <button 
-            className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 text-white/60 hover:text-gold p-4 focus-visible:outline-2 focus-visible:outline-gold bg-dark-maroon/50 hover:bg-dark-maroon rounded-full transition-all z-50"
+            className="absolute left-2 sm:left-8 top-1/2 -translate-y-1/2 text-white/60 hover:text-gold p-2.5 sm:p-4 focus-visible:outline-2 focus-visible:outline-gold bg-dark-maroon/50 hover:bg-dark-maroon rounded-full transition-all z-50"
             onClick={(e) => { 
               e.stopPropagation(); 
               const item = filteredItems[lightboxIndex];
@@ -151,13 +156,13 @@ export default function Galeri() {
             }}
             aria-label="Previous image"
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="sm:w-6 sm:h-6">
               <polyline points="15 18 9 12 15 6"></polyline>
             </svg>
           </button>
           
           <button 
-            className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 text-white/60 hover:text-gold p-4 focus-visible:outline-2 focus-visible:outline-gold bg-dark-maroon/50 hover:bg-dark-maroon rounded-full transition-all z-50"
+            className="absolute right-2 sm:right-8 top-1/2 -translate-y-1/2 text-white/60 hover:text-gold p-2.5 sm:p-4 focus-visible:outline-2 focus-visible:outline-gold bg-dark-maroon/50 hover:bg-dark-maroon rounded-full transition-all z-50"
             onClick={(e) => { 
               e.stopPropagation(); 
               const item = filteredItems[lightboxIndex];
@@ -170,12 +175,12 @@ export default function Galeri() {
             }}
             aria-label="Next image"
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="sm:w-6 sm:h-6">
               <polyline points="9 18 15 12 9 6"></polyline>
             </svg>
           </button>
 
-          <div className="w-[85vw] max-w-5xl h-[65vh] md:h-[75vh] relative rounded-md overflow-hidden shadow-2xl" onClick={(e) => e.stopPropagation()}>
+          <div className="w-[92vw] sm:w-[85vw] max-w-5xl h-[60vh] sm:h-[75vh] relative rounded-md overflow-hidden shadow-2xl" onClick={(e) => e.stopPropagation()}>
              {/* Main image or gallery */}
              <div 
                className="w-full h-full transition-all duration-500 ease-in-out" 
