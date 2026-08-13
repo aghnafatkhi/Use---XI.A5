@@ -1,40 +1,26 @@
 import type {Metadata} from 'next';
-import { Instrument_Serif, Syne, Syne_Mono, Satisfy } from 'next/font/google';
+import { Plus_Jakarta_Sans, Space_Mono } from 'next/font/google';
 import './globals.css';
 
-const instrumentSerif = Instrument_Serif({
-  weight: ['400'],
-  style: ['normal', 'italic'],
+const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ['latin'],
-  variable: '--font-instrument',
+  variable: '--font-pj',
 });
 
-const syne = Syne({
-  weight: ['400', '700', '800'],
+const spaceMono = Space_Mono({
+  weight: ['400', '700'],
   subsets: ['latin'],
-  variable: '--font-syne',
-});
-
-const syneMono = Syne_Mono({
-  weight: ['400'],
-  subsets: ['latin'],
-  variable: '--font-syne-mono',
-});
-
-const satisfy = Satisfy({
-  weight: ['400'],
-  subsets: ['latin'],
-  variable: '--font-satisfy',
+  variable: '--font-sm',
 });
 
 export const metadata: Metadata = {
-  title: 'Epsilonscience XII IPA 5',
-  description: 'Website kenangan kelas XII IPA 5 SMAN 1 Cileungsi (2025/2026).',
+  title: 'Epsilonscience XII.A5',
+  description: 'Website kenangan kelas XII.A5 SMAN 1 Cileungsi (2026/2027).',
 };
 
 export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
-    <html lang="en" className={`${instrumentSerif.variable} ${syne.variable} ${syneMono.variable} ${satisfy.variable}`}>
+    <html lang="en" className={`${plusJakartaSans.variable} ${spaceMono.variable}`}>
       <body className="antialiased font-syne" suppressHydrationWarning>
         {children}
       </body>

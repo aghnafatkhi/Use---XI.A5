@@ -14,7 +14,7 @@ export const staticGalleryData = [
 ];
 
 export const staticStudents = [
-  { absen: '01', name: 'Adam Mudzaki', role: 'Seksi Olahraga / Kesehatan', quote: 'Memimpin dengan ketegasan, menyatukan dengan kebersamaan XII IPA 5.' },
+  { absen: '01', name: 'Adam Mudzaki', role: 'Seksi Olahraga / Kesehatan', quote: 'Memimpin dengan ketegasan, menyatukan dengan kebersamaan XI.A5.' },
   { absen: '02', name: 'Aghna Fathi Putra Buono', role: '', quote: 'Setiap coretan tinta merekam perjalanan tak terlupakan kelas kita.' },
   { absen: '03', name: 'Alisha Putri Vallena Haris', role: 'Ketua Kelas', quote: 'Mendukung setiap langkah demi kebaikan dan keharmonisan kelas.' },
   { absen: '04', name: 'Asyifa Khoerunnisa', role: 'Seksi Upacara / Keamanan', quote: 'Jadilah dirimu sendiri, versi terbaik di setiap kesempatan.' },
@@ -53,7 +53,7 @@ export const staticStudents = [
 ];
 
 export const staticMemories = [
-  { title: "Masa Orientasi", date: "Agustus 2025", desc: "Hari pertama berkumpul sebagai kesatuan XII IPA 5.", rotate: "-2deg", bg: "linear-gradient(135deg, #5C1414 0%, #8B3333 100%)", order: 1 },
+  { title: "Masa Orientasi", date: "Agustus 2025", desc: "Hari pertama berkumpul sebagai kesatuan XI.A5.", rotate: "-2deg", bg: "linear-gradient(135deg, #5C1414 0%, #8B3333 100%)", order: 1 },
   { title: "Persiapan Ujian", date: "Oktober 2025", desc: "Kegiatan belajar bersama menjelang Evaluasi Tengah Semester.", rotate: "1.5deg", bg: "linear-gradient(160deg, #3A0A0A 0%, #6B2020 60%)", order: 2 },
   { title: "Partisipasi PORSENI", date: "November 2025", desc: "Menjalin sportivitas dan kreativitas kelas.", rotate: "-1deg", bg: "linear-gradient(145deg, #C4973A 0%, #8B6020 50%, #5C1414 100%)", order: 3 },
   { title: "Solidaritas Harian", date: "Sepanjang Tahun", desc: "Interaksi edukatif dan kolaboratif antar siswa sehari-hari.", rotate: "2deg", bg: "linear-gradient(125deg, #4A0E0E 30%, #7A3535 100%)", order: 4 },

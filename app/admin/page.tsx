@@ -150,7 +150,7 @@ export default function AdminPage() {
             batch.set(newDoc, item);
           });
           await batch.commit();
-          console.log('Auto Sync: Successfully updated database with the new XII IPA 5 student roster.');
+          console.log('Auto Sync: Successfully updated database with the new XI.A5 student roster.');
         } catch (err) {
           console.error('Auto Sync Error:', err);
         }
@@ -162,7 +162,7 @@ export default function AdminPage() {
             batch.set(newDoc, item);
           });
           await batch.commit();
-          console.log('Auto Sync: Seeded database with the new XII IPA 5 student roster.');
+          console.log('Auto Sync: Seeded database with the new XI.A5 student roster.');
         } catch (err) {
           console.error('Auto Seed Error:', err);
         }
@@ -192,8 +192,8 @@ export default function AdminPage() {
   const seedStudents = async () => {
     const isOverwrite = students.length > 0;
     const confirmMsg = isOverwrite 
-      ? 'Peringatan: Tindakan ini akan menghapus semua anggota kelas saat ini di database dan menyinkronkan ulang dengan daftar absen baru (XII IPA 5 - 36 Siswa). Lanjutkan?'
-      : 'Impor data anggota kelas awal (XII IPA 5 - 36 Siswa)?';
+      ? 'Peringatan: Tindakan ini akan menghapus semua anggota kelas saat ini di database dan menyinkronkan ulang dengan daftar absen baru (XI.A5 - 36 Siswa). Lanjutkan?'
+      : 'Impor data anggota kelas awal (XI.A5 - 36 Siswa)?';
     
     if (!confirm(confirmMsg)) return;
     try {
@@ -532,8 +532,8 @@ export default function AdminPage() {
             {hasOldStudents && (
               <div className="bg-amber-950/80 border border-amber-600/50 p-4 rounded-lg mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                  <h3 className="text-amber-400 font-bold font-syne text-sm uppercase">Absen Kelas Lama Terdeteksi!</h3>
-                  <p className="text-xs text-[#F4EDE0]/80 mt-1">Sistem mendeteksi data anggota kelas di database masih menggunakan data lama (XI IPA 5). Silakan klik tombol di samping untuk menyinkronkan ke absen resmi baru (XII IPA 5).</p>
+                  <h3 className="text-amber-400 font-bold font-syne text-sm uppercase">Absen Kelas Tidak Sinkron Terdeteksi!</h3>
+                  <p className="text-xs text-[#F4EDE0]/80 mt-1">Sistem mendeteksi data anggota kelas di database atau perannya belum sepenuhnya sinkron dengan absen terbaru (XI.A5). Silakan klik tombol di samping untuk menyinkronkan ke absen resmi baru (XI.A5).</p>
                 </div>
                 <button onClick={seedStudents} className="bg-amber-600 hover:bg-amber-500 text-black font-extrabold uppercase tracking-widest text-[11px] px-4 py-2 rounded transition-all whitespace-nowrap">
                   Sinkronkan Baru Sekarang

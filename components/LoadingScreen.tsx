@@ -14,14 +14,14 @@ export default function LoadingScreen({ onComplete }: { onComplete: () => void }
 
   return (
     <div 
-      className={`fixed inset-0 z-[1000] flex flex-col items-center justify-center bg-[#3A0A0A] transition-transform duration-500 ease-in-out ${shrinking ? '-translate-y-full' : 'translate-y-0'}`}
+      className={`fixed inset-0 z-[1000] flex flex-col items-center justify-center bg-dark-maroon transition-transform duration-500 ease-in-out ${shrinking ? '-translate-y-full' : 'translate-y-0'}`}
     >
       <div className="flex flex-col items-center justify-center relative">
-        <span className="font-instrument text-[80px] italic text-[#C4973A] leading-none mb-4 tracking-tighter">ε</span>
-        <span className="font-satisfy text-[28px] text-[#F4EDE0]">Epsilonscience</span>
+        <span className="font-instrument text-[80px] italic text-gold leading-none mb-4 tracking-tighter">ε</span>
+        <span className="font-satisfy text-[28px] text-white">Epsilonscience</span>
         {/* Progress line */}
         <div className="absolute -bottom-6 left-0 right-0 h-[1px]">
-          <div className="h-full bg-[#C4973A] w-0 animate-[loadingLine_1.6s_ease-in-out_forwards]"></div>
+          <div className="h-full bg-gold w-0 animate-[loadingLine_1.6s_ease-in-out_forwards]"></div>
         </div>
       </div>
 
