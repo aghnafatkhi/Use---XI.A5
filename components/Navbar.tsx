@@ -92,7 +92,7 @@ export default function Navbar() {
           {/* Mobile Hamburg */}
           <div className="flex md:hidden items-center space-x-4">
             <button 
-              className="flex items-center justify-center h-11 w-11 text-gold hover:text-white transition-colors focus-visible:outline-2 focus-visible:outline-gold p-2"
+              className="flex items-center justify-center h-11 w-11 text-dark-maroon hover:text-gold transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-gold p-2"
               onClick={() => setMenuOpen(true)}
               aria-label="Open menu"
             >
@@ -110,9 +110,9 @@ export default function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed inset-0 z-[3000] bg-[var(--bg-color)] flex flex-col p-8"
+            className="fixed inset-0 z-[3000] bg-[var(--bg-color)] flex flex-col p-8 overflow-y-auto"
           >
-            <div className="flex justify-end mb-12">
+            <div className="flex justify-end mb-8">
               <button 
                 onClick={() => setMenuOpen(false)} 
                 aria-label="Close menu" 
@@ -121,7 +121,7 @@ export default function Navbar() {
                 <X size={24} />
               </button>
             </div>
-            <div className="flex flex-col space-y-6 flex-grow">
+            <div className="flex flex-col space-y-6 flex-grow justify-center py-6">
               {navLinks.map((link, index) => (
                 <motion.a 
                   key={link.href} 
@@ -131,7 +131,7 @@ export default function Navbar() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 10 }}
                   transition={{ delay: index * 0.04, duration: 0.25, ease: "easeOut" }}
-                  className="flex items-center font-instrument italic text-[2.5rem] text-[var(--text-primary)] hover:text-gold transition-colors"
+                  className="flex items-center font-instrument italic text-[clamp(1.8rem,8vw,2.5rem)] text-[var(--text-primary)] hover:text-gold transition-colors"
                 >
                   <span className="font-instrument text-gold text-lg mr-4 not-italic relative -top-1">ε</span>
                   {link.label}
