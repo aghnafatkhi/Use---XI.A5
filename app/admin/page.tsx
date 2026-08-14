@@ -53,6 +53,8 @@ export default function AdminPage() {
   const [editingGallery, setEditingGallery] = useState<any | null>(null);
   const [galleryImages, setGalleryImages] = useState<string[]>([]);
   const [isCompressing, setIsCompressing] = useState(false);
+  const [previewItem, setPreviewItem] = useState<any | null>(null);
+  const [previewImageIndex, setPreviewImageIndex] = useState<number>(0);
 
   const hasOldStudents = students.some(s => s.name === 'Abyan Dzaky Pratama' || s.name === 'Adinda Putri Rahayu');
 
@@ -511,12 +513,27 @@ export default function AdminPage() {
               {galleries.map(g => (
                 <div key={g.id} className="relative aspect-[4/5] overflow-hidden group rounded-lg border border-[#C4973A4D]">
                   <div className="absolute inset-0 bg-cover bg-center" style={{ background: g.bg.startsWith('http') || g.bg.startsWith('data:') ? `url(${g.bg}) center/cover no-repeat` : g.bg }}></div>
-                  <div className="absolute inset-0 bg-black/60 p-4 flex flex-col justify-between opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div className="flex justify-between items-start">
-                      <button onClick={() => { setEditingGallery(g); setGalleryImages(g.images || []); setPreview(g.bg); setActiveTab('gallery'); window.scrollTo(0,0); }} className="bg-[#C4973A] text-black px-3 py-1 text-xs rounded hover:bg-[#F4EDE0] font-bold">Edit</button>
-                      <button onClick={() => deleteDocItem('gallery', g.id)} className="bg-red-900/80 text-white px-3 py-1 text-xs rounded hover:bg-red-600">Hapus</button>
+                  <div 
+                    onClick={() => { setPreviewItem(g); setPreviewImageIndex(0); }}
+                    className="absolute inset-0 bg-black/60 p-4 flex flex-col justify-between opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                  >
+                    <div className="flex justify-between items-start z-10">
+                      <button onClick={(e) => { e.stopPropagation(); setEditingGallery(g); setGalleryImages(g.images || []); setPreview(g.bg); setActiveTab('gallery'); window.scrollTo(0,0); }} className="bg-[#C4973A] text-black px-3 py-1 text-xs rounded hover:bg-[#F4EDE0] font-bold">Edit</button>
+                      <button onClick={(e) => { e.stopPropagation(); deleteDocItem('gallery', g.id); }} className="bg-red-900/80 text-white px-3 py-1 text-xs rounded hover:bg-red-600">Hapus</button>
                     </div>
-                    <div className="drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                    
+                    {/* Centered Preview Prompt */}
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <span className="bg-black/60 border border-[#C4973A] text-[#C4973A] text-[10px] md:text-xs font-syne uppercase tracking-widest px-3 py-1.5 rounded-full font-bold flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        Pratinjau
+                      </span>
+                    </div>
+
+                    <div className="drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] z-10">
                       <div className="text-[#C4973A] text-[10px] uppercase font-syne mb-1 font-bold">{g.category}</div>
                       <div className="text-sm font-instrument italic text-white">{g.title}</div>
                     </div>
@@ -681,6 +698,110 @@ export default function AdminPage() {
           </section>
         )}
       </div>
+
+      {/* IMAGE PREVIEW MODAL */}
+      {previewItem && (
+        <div className="fixed inset-0 z-[5000] bg-black/90 flex flex-col items-center justify-center p-4 backdrop-blur-md" onClick={() => setPreviewItem(null)}>
+          <div className="relative max-w-4xl w-full bg-[#1c0707] border border-[#C4973A4D] rounded-xl overflow-hidden shadow-2xl p-4 md:p-6" onClick={(e) => e.stopPropagation()}>
+            {/* Close Button */}
+            <button 
+              onClick={() => setPreviewItem(null)} 
+              className="absolute top-4 right-4 text-white/70 hover:text-[#C4973A] transition-colors p-2 z-50 bg-black/40 rounded-full cursor-pointer"
+              aria-label="Close preview"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            {/* Title / Header */}
+            <div className="mb-4">
+              <span className="text-[10px] uppercase font-syne tracking-widest text-[#C4973A] font-bold block mb-1">{previewItem.category}</span>
+              <h3 className="text-lg md:text-xl font-instrument italic text-[#F4EDE0]">{previewItem.title}</h3>
+            </div>
+
+            {/* Main Image Container */}
+            <div className="relative aspect-[16/10] md:aspect-[16/9] bg-[#0c0303] rounded-lg overflow-hidden flex items-center justify-center border border-[#C4973A1A] group">
+              {/* Previous Button */}
+              {previewItem.images && previewItem.images.length > 1 && (
+                <button 
+                  onClick={() => setPreviewImageIndex((prev) => (prev - 1 + previewItem.images.length) % previewItem.images.length)}
+                  className="absolute left-4 z-10 bg-black/50 hover:bg-black/80 text-white rounded-full p-2.5 transition-all hover:text-[#C4973A] cursor-pointer"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+              )}
+
+              {/* Next Button */}
+              {previewItem.images && previewItem.images.length > 1 && (
+                <button 
+                  onClick={() => setPreviewImageIndex((prev) => (prev + 1) % previewItem.images.length)}
+                  className="absolute right-4 z-10 bg-black/50 hover:bg-black/80 text-white rounded-full p-2.5 transition-all hover:text-[#C4973A] cursor-pointer"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              )}
+
+              {/* The Photo */}
+              <img 
+                src={previewItem.images && previewItem.images.length > 0 ? previewItem.images[previewImageIndex] : previewItem.bg} 
+                alt={previewItem.title} 
+                className="max-h-[55vh] md:max-h-[60vh] max-w-full object-contain select-none"
+              />
+
+              {/* Pagination counter */}
+              {previewItem.images && previewItem.images.length > 1 && (
+                <div className="absolute bottom-4 bg-black/60 text-[#F4EDE0] text-xs font-syne px-3 py-1 rounded-full border border-[#C4973A22]">
+                  {previewImageIndex + 1} / {previewItem.images.length}
+                </div>
+              )}
+            </div>
+
+            {/* Quick Actions Panel */}
+            <div className="mt-5 pt-4 border-t border-[#C4973A1A] flex flex-wrap gap-3 items-center justify-between">
+              <span className="text-xs text-[#F4EDE080] font-syne-mono">
+                ID: {previewItem.id}
+              </span>
+              <div className="flex gap-2">
+                <button 
+                  onClick={() => {
+                    setEditingGallery(previewItem);
+                    setGalleryImages(previewItem.images || []);
+                    setPreview(previewItem.bg);
+                    setActiveTab('gallery');
+                    setPreviewItem(null);
+                    window.scrollTo(0, 0);
+                  }}
+                  className="bg-[#C4973A] text-black px-4 py-2 text-xs uppercase font-syne tracking-widest font-bold rounded hover:bg-[#F4EDE0] transition-colors flex items-center gap-1.5 cursor-pointer"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  Edit Item
+                </button>
+                <button 
+                  onClick={async () => {
+                    const confirmDel = confirm('Apakah kamu yakin ingin menghapus data ini?');
+                    if (!confirmDel) return;
+                    await deleteDocItem('gallery', previewItem.id);
+                    setPreviewItem(null);
+                  }}
+                  className="bg-red-900/90 text-white px-4 py-2 text-xs uppercase font-syne tracking-widest font-bold rounded hover:bg-red-600 transition-colors flex items-center gap-1.5 cursor-pointer"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  Hapus Item
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
