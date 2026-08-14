@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { collection, onSnapshot, orderBy, query as firestoreQuery } from 'firebase/firestore';
-import { Search } from 'lucide-react';
+import { Search, Sparkles, X, Quote } from 'lucide-react';
 import { db, auth } from '../lib/firebase';
 import { staticStudents } from '../lib/constants';
 
@@ -54,13 +54,11 @@ function handleFirestoreError(error: any, operationType: OperationType, path: st
 
   console.error('Firestore Error: ', JSON.stringify(errInfo));
 
-  // Throw structured exception only for authorization blocks so system logs can identify permission gaps
   if (isPermissionDenied) {
     throw new Error(JSON.stringify(errInfo));
   }
 }
 
-// Helper to get initials
 const getInitials = (name: string) => {
   const parts = name.split(' ');
   if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
@@ -69,8 +67,9 @@ const getInitials = (name: string) => {
 
 export default function Siswa() {
   const [query, setQuery] = useState('');
-  const [flipped, setFlipped] = useState<string | null>(null);
+  const [selectedStudent, setSelectedStudent] = useState<any | null>(null);
   const [students, setStudents] = useState<any[]>(staticStudents);
+  const [flippedAbsen, setFlippedAbsen] = useState<number | null>(null);
 
   useEffect(() => {
     const pathForOnSnapshot = 'students';
@@ -99,127 +98,191 @@ export default function Siswa() {
   const filtered = students.filter(s => s.name.toLowerCase().includes(query.toLowerCase()));
 
   return (
-    <section id="siswa" className="relative pt-[60px] pb-[60px] md:pt-[80px] md:pb-[80px] bg-[var(--bg-color)] graph-paper">
-      {/* HEADER */}
-      <div className="max-w-7xl mx-auto px-6 md:px-[6vw] lg:px-[8vw] mb-12 md:mb-16 relative">
-        <div className="absolute left-0 top-0 origin-top-left -rotate-90 hidden lg:block">
-          <span className="font-syne font-extrabold text-[9px] text-maroon/30 tracking-[0.25em] uppercase">
-            03 — Data Siswa
-          </span>
-        </div>
-
-        <div className="sr-up md:pr-10">
-          <h2 className="font-instrument italic text-[3rem] md:text-[3.5rem] lg:text-[4rem] text-maroon leading-[1.1] mb-3 whitespace-pre-line">
-            {"Anggota Kelas."}
-          </h2>
-          <p className="font-syne-mono text-[0.85rem] text-[var(--text-muted)] max-w-sm">
-            {filtered.length} Siswa di XII.A5
-          </p>
-        </div>
-
-        {/* SEARCH BAR */}
-        <div className="mt-10 md:mt-12 max-w-[420px] relative sr-up delay-2">
-           <div className="flex items-center border-b-2 border-chalk pb-3 transition-colors focus-within:border-gold group">
-             <Search size={18} className="text-gold mr-3 transition-transform group-focus-within:scale-110" />
-             <input 
-               type="text" 
-               placeholder="Cari nama siswa..." 
-               value={query}
-               onChange={(e) => setQuery(e.target.value)}
-               className="w-full bg-transparent font-syne text-[1rem] text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none"
-             />
-             {query && (
-               <button onClick={() => setQuery('')} className="text-[var(--text-muted)] hover:text-gold p-1 font-bold" aria-label="Clear search">×</button>
-             )}
-           </div>
+    <section 
+      id="siswa" 
+      className="relative pt-12 pb-16 md:pt-16 md:pb-24 bg-[var(--bg-color)] graph-paper overflow-hidden"
+    >
+      
+      {/* Decorative vertical lines on desktop */}
+      <div className="absolute left-[8%] top-0 bottom-0 w-[1px] bg-gold/10 hidden xl:block pointer-events-none"></div>
+      
+      {/* Colossal watermark - hidden on mobile for clean, fast render */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0 hidden md:block">
+        <div className="absolute right-6 top-48 origin-top-right rotate-90 opacity-[0.02] text-dark-maroon font-syne font-black text-[120px] tracking-widest uppercase select-none">
+          MEMBERLIST
         </div>
       </div>
 
-      {/* STUDENT GRID */}
-      <div className="max-w-7xl mx-auto px-6 md:px-[6vw] lg:px-[8vw]">
+      {/* HEADER SECTION */}
+      <div className="max-w-7xl mx-auto px-6 md:px-[8vw] mb-10 md:mb-12 relative z-10">
+        
+        {/* Fine cross hair detail on header */}
+        <div className="absolute -left-4 top-1/2 -translate-y-1/2 w-8 h-[1px] bg-gold/30 hidden xl:block"></div>
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[1px] h-8 bg-gold/30 hidden xl:block"></div>
+
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="font-syne-mono text-[8px] text-gold tracking-[0.3em] uppercase font-bold">
+                03 / THE CHRONICLES
+              </span>
+              <div className="w-1 h-1 bg-gold rounded-full"></div>
+            </div>
+            
+            <h2 className="font-syne font-black text-3xl md:text-5xl lg:text-6xl text-dark-maroon tracking-tighter uppercase leading-[0.95] m-0">
+              DAFTAR <br />
+              <span className="font-instrument italic font-light text-gold text-2xl md:text-4xl lg:text-5xl lowercase tracking-normal block mt-1">
+                anggota kelas.
+              </span>
+            </h2>
+            
+            <p className="font-syne-mono text-[8px] md:text-[9px] text-muted tracking-widest uppercase block pt-1">
+              MENAMPILKAN {filtered.length} KEPALA KELUARGA • XII.A5
+            </p>
+          </div>
+
+          {/* SEARCH BAR - Clean border stamp */}
+          <div className="w-full md:w-80">
+            <div className="flex items-center border border-gold/25 bg-white/50 backdrop-blur-sm px-4 py-2.5 shadow-[0_2px_10px_rgba(0,0,0,0.01)] rounded-[1px] transition-colors focus-within:border-gold group">
+              <Search size={13} className="text-gold mr-2.5 transition-transform group-focus-within:scale-105" />
+              <input 
+                type="text" 
+                placeholder="Cari nama siswa..." 
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                className="w-full bg-transparent font-syne text-[11px] text-dark-maroon placeholder-muted/60 outline-none"
+              />
+              {query && (
+                <button 
+                  onClick={() => setQuery('')} 
+                  className="text-muted/70 hover:text-gold pl-1.5 text-sm leading-none font-bold" 
+                  aria-label="Clear search"
+                >
+                  ×
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      {/* STUDENT GRID - Flat layout optimized for direct touch clicks */}
+      <div className="max-w-7xl mx-auto px-6 md:px-[8vw] relative z-10">
         {filtered.length === 0 ? (
-          <div className="text-center py-20 sr-fade">
-             <p className="font-syne text-[var(--text-muted)] text-[1.1rem]">Catatan biodata tidak dapat ditemukan dalam kueri pencarian. Harap ulangi.</p>
+          <div className="text-center py-16 border border-dashed border-gold/15 rounded-[1px] bg-white/10">
+            <Sparkles className="text-gold/30 mx-auto mb-3" size={20} />
+            <p className="font-syne text-muted text-[10px] uppercase tracking-wider">
+              Biodata tidak ditemukan. Silakan coba pencarian lain.
+            </p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-[2px] md:gap-[4px]">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
             {filtered.map((s, index) => {
               const gradients = [
-                'linear-gradient(135deg, #0D1B4B 0%, #1A3FBF 100%)',
-                'linear-gradient(160deg, #050E2E 0%, #15329E 100%)',
-                'linear-gradient(110deg, #0A153D 0%, #1C41C4 100%)',
-                'linear-gradient(145deg, #081236 0%, #224ED2 100%)'
+                'linear-gradient(135deg, #4A121A 0%, #1E0508 100%)', // Deep Maroon/Crimson
+                'linear-gradient(135deg, #1C2442 0%, #0B0E1B 100%)', // Premium Deep Navy
+                'linear-gradient(135deg, #3C2915 0%, #150E06 100%)', // Premium Antique Gold-Brown
+                'linear-gradient(135deg, #2D1A3B 0%, #100617 100%)'  // Deep Velvet Purple
               ];
               const bg = gradients[index % gradients.length];
-              const isFlipped = flipped === s.absen;
 
               return (
                 <div 
-                   key={s.absen} 
-                   className="h-[260px] md:h-[280px] w-full [perspective:1200px] border border-chalk sr-up group cursor-pointer"
-                   style={{ transitionDelay: `${(index % 8) * 0.05}s` }}
-                   onMouseEnter={() => setFlipped(s.absen)}
-                   onMouseLeave={() => setFlipped(null)}
-                   onClick={() => setFlipped(isFlipped ? null : s.absen)} // For mobile
-                   role="button"
-                   tabIndex={0}
-                   onKeyDown={(e) => { if (e.key === 'Enter') setFlipped(isFlipped ? null : s.absen); }}
+                  key={s.absen} 
+                  className="bg-white border border-gold/15 p-2.5 md:p-3.5 flex flex-col justify-between shadow-[2px_6px_15px_rgba(0,0,0,0.02)] hover:shadow-[4px_12px_24px_rgba(0,0,0,0.06)] hover:border-gold/30 transition-all duration-300 rounded-[1px] cursor-pointer group relative overflow-visible"
+                  onClick={() => setFlippedAbsen(flippedAbsen === s.absen ? null : s.absen)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => { if (e.key === 'Enter') setFlippedAbsen(flippedAbsen === s.absen ? null : s.absen); }}
                 >
-                  <div className={`relative w-full h-full transition-transform duration-700 [transform-style:preserve-3d] ${isFlipped ? '[transform:rotateY(180deg)]' : ''}`}>
-                                      {/* FRONT FACE */}
+                  {/* Photo/Initials Container with 3D Flip perspective */}
+                  <div className="[perspective:1000px] h-[110px] sm:h-[135px] md:h-[155px] w-full relative">
                     <div 
-                      className="absolute inset-0 w-full h-full [backface-visibility:hidden] [-webkit-backface-visibility:hidden] bg-[var(--bg-warm)] flex flex-col justify-between group-hover:shadow-[inset_0_-4px_0_0_#FFD700] transition-all duration-300 rounded-[2px]"
-                      style={{ transform: 'translate3d(0,0,0)' }}
+                      className={`w-full h-full relative transition-transform duration-500 [transform-style:preserve-3d] ${
+                        flippedAbsen === s.absen ? '[transform:rotateY(180deg)]' : ''
+                      }`}
                     >
-                       <div className="h-[95px] md:h-[120px] w-full relative" style={{background: bg}}>
-                          <div className="absolute bottom-[-24px] md:bottom-[-32px] left-1/2 -translate-x-1/2 w-12 h-12 md:w-16 md:h-16 rounded-full bg-cream/20 border-[2px] border-gold/60 flex items-center justify-center backdrop-blur-sm shadow-md">
-                             <span className="font-instrument italic text-[1rem] md:text-[1.3rem] text-white drop-shadow-md select-none">{getInitials(s.name)}</span>
-                          </div>
-                       </div>
-                       
-                       <div className="pt-[32px] md:pt-[44px] px-3 md:px-4 pb-3 md:pb-5 text-center flex-1 flex flex-col items-center justify-between">
-                          <div className="w-full flex flex-col items-center">
-                            <h3 className="font-syne font-bold text-[0.75rem] md:text-[0.9rem] text-[var(--text-primary)] uppercase tracking-[0.02em] mb-1 line-clamp-2 leading-tight group-hover:text-maroon transition-colors">
-                              {s.name}
-                            </h3>
-                            <span className="font-syne-mono text-[0.6rem] md:text-[0.7rem] text-gold font-bold">No. {s.absen}</span>
-                          </div>
-                          {s.role && (
-                            <span className="font-syne font-bold text-[0.5rem] md:text-[0.6rem] uppercase tracking-[0.05em] text-gold border border-gold px-1.5 py-[1px] rounded-full mt-2 bg-gold/5 select-none">
-                              {s.role}
-                            </span>
-                          )}
-                          <div className="w-[80%] h-[1px] bg-gold/10 absolute justify-self-end mt-auto bottom-3 md:bottom-4"></div>
-                       </div>
-                    </div>
+                      {/* FRONT FACE */}
+                      <div 
+                        className="absolute inset-0 w-full h-full [backface-visibility:hidden] overflow-hidden rounded-[1px]"
+                        style={{ background: bg }}
+                      >
+                        {/* Inner frame lines */}
+                        <div className="absolute inset-1.5 border border-white/5 pointer-events-none">
+                          <div className="absolute top-0 left-0 w-1 h-1 border-t border-l border-white/20"></div>
+                          <div className="absolute top-0 right-0 w-1 h-1 border-t border-r border-white/20"></div>
+                          <div className="absolute bottom-0 left-0 w-1 h-1 border-b border-l border-white/20"></div>
+                          <div className="absolute bottom-0 right-0 w-1 h-1 border-b border-r border-white/20"></div>
+                        </div>
 
-                    {/* BACK FACE */}
-                    <div 
-                      className="absolute inset-0 w-full h-full [backface-visibility:hidden] [-webkit-backface-visibility:hidden] [transform:rotateY(180deg)] bg-dark-maroon flex flex-col justify-between overflow-hidden shadow-inner rounded-[2px]"
-                      style={{ transform: 'rotateY(180deg) translate3d(0,0,0)' }}
-                    >
-                       {/* Matching Top Gradient Block */}
-                       <div className="h-[95px] md:h-[120px] w-full relative px-4 pt-3 md:pt-4 flex justify-between items-start" style={{background: bg}}>
-                          <span className="font-syne-mono text-[1.4rem] md:text-[2.2rem] text-white/50 leading-none select-none">No. {s.absen}</span>
-                          <span className="font-instrument italic text-white/50 text-xl md:text-2xl select-none">ε</span>
-                       </div>
+                        {/* Absen Stamp */}
+                        <div className="absolute top-2 left-2 bg-black/45 backdrop-blur-sm border border-white/10 px-1 py-0.5 rounded-[1px]">
+                          <span className="font-syne-mono text-[5px] sm:text-[6px] text-gold tracking-widest uppercase font-bold">
+                            ABS. {s.absen.toString().padStart(2, '0')}
+                          </span>
+                        </div>
 
-                       <div className="p-3.5 md:p-5 flex-1 flex flex-col justify-between">
-                          <div>
-                            <h3 className="font-syne font-bold text-[0.75rem] md:text-[0.95rem] text-white uppercase mb-1 leading-snug line-clamp-2">{s.name}</h3>
-                            {s.role && (
-                              <span className="font-syne text-[0.6rem] md:text-[0.75rem] text-gold font-bold tracking-wide uppercase select-none">{s.role}</span>
-                            )}
-                          </div>
-                          
-                          <p className="font-instrument italic text-[0.72rem] md:text-[0.9rem] text-white/90 leading-[1.4] my-2 line-clamp-3 select-text">
-                             &quot;{s.quote || 'Tercatat pada database akademik kelas XII.A5 periode ajaran ini.'}&quot;
+                        {/* Initials */}
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="font-instrument italic text-xl sm:text-2xl md:text-3xl text-cream/95 select-none transition-transform duration-300 group-hover:scale-105">
+                            {getInitials(s.name)}
+                          </span>
+                        </div>
+
+                        {/* Sparkle decorative indicator */}
+                        <div className="absolute bottom-2 right-2 text-white/35">
+                          <Sparkles size={8} />
+                        </div>
+                      </div>
+
+                      {/* BACK FACE */}
+                      <div 
+                        className="absolute inset-0 w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)] bg-dark-maroon border border-gold/30 p-2.5 sm:p-3 flex flex-col justify-between overflow-hidden rounded-[1px]"
+                      >
+                        {/* Quote Content */}
+                        <div className="flex-grow flex flex-col justify-center text-center">
+                          <p className="font-instrument italic text-[8px] sm:text-[10px] md:text-xs text-cream/90 leading-relaxed line-clamp-4">
+                            &ldquo;{s.quote || 'Tercatat sebagai bagian dari keluarga besar XII.A5.'}&rdquo;
                           </p>
+                        </div>
 
-                          <span className="font-syne-mono text-[0.5rem] md:text-[0.65rem] text-gold/40 tracking-widest text-center mt-auto select-none">ARSIP SISWA • EPSILON</span>
-                       </div>
+                        {/* Bottom action trigger to open modal detail */}
+                        <div className="flex justify-between items-center border-t border-gold/10 pt-1.5 mt-1">
+                          <span className="font-syne-mono text-[5px] text-gold/60 uppercase">TAP TO RETURN</span>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedStudent(s);
+                            }}
+                            className="bg-gold hover:bg-gold/90 text-dark-maroon text-[5px] sm:text-[7px] font-syne font-black uppercase tracking-widest px-1.5 py-0.5 rounded-[1px] transition-colors"
+                          >
+                            DETAIL
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Label Info (Always visible below flippable photo card!) */}
+                  <div className="pt-2 flex-grow flex flex-col justify-between items-center text-center">
+                    <div className="w-full">
+                      <h3 className="font-syne font-black text-[9px] sm:text-xs text-dark-maroon uppercase tracking-tight line-clamp-1 group-hover:text-gold transition-colors">
+                        {s.name}
+                      </h3>
                     </div>
 
+                    {s.role ? (
+                      <div className="bg-gold/10 border border-gold/25 px-2 py-0.5 mt-1 inline-block">
+                        <span className="font-syne font-black text-[6px] sm:text-[7px] uppercase tracking-[0.1em] text-dark-maroon">
+                          {s.role}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="font-syne-mono text-[6px] sm:text-[7px] text-muted/60 tracking-wider uppercase mt-1">
+                        ANGGOTA
+                      </span>
+                    )}
                   </div>
                 </div>
               );
@@ -227,6 +290,75 @@ export default function Siswa() {
           </div>
         )}
       </div>
+
+      {/* INDEPENDENT STUDENT DETAILS DIALOG: Super clean, high-performance modal with perfect readability */}
+      {selectedStudent && (
+        <div 
+          className="fixed inset-0 z-[2100] flex items-center justify-center p-4 bg-dark-maroon/90 backdrop-blur-md animate-fade-in"
+          onClick={() => setSelectedStudent(null)}
+        >
+          <div 
+            className="bg-white border border-gold/20 w-full max-w-md p-6 md:p-8 rounded-[1px] shadow-2xl relative flex flex-col justify-between overflow-hidden animate-slide-up"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Elegant Background Logo Detail */}
+            <div className="absolute -right-10 -bottom-10 opacity-5 font-syne font-black text-9xl text-dark-maroon select-none pointer-events-none">
+              &epsilon;
+            </div>
+
+            {/* Close Button */}
+            <button 
+              className="absolute top-4 right-4 text-dark-maroon/60 hover:text-gold transition-colors p-1.5 rounded-full hover:bg-gold/10 cursor-pointer"
+              onClick={() => setSelectedStudent(null)}
+              aria-label="Close dialog"
+            >
+              <X size={16} />
+            </button>
+
+            {/* Content Top */}
+            <div className="flex justify-between items-start border-b border-gold/10 pb-4 mb-5">
+              <span className="font-syne-mono text-[10px] text-gold/90 uppercase tracking-widest font-bold">
+                NO. ABSEN {selectedStudent.absen.toString().padStart(2, '0')}
+              </span>
+              <span className="font-instrument italic text-gold text-lg select-none leading-none">
+                &epsilon;
+              </span>
+            </div>
+
+            {/* Main content body */}
+            <div className="space-y-4">
+              <div>
+                <h3 className="font-syne font-black text-lg md:text-xl text-dark-maroon uppercase tracking-tight leading-tight">
+                  {selectedStudent.name}
+                </h3>
+                {selectedStudent.role ? (
+                  <span className="font-syne font-black text-[9px] text-gold uppercase tracking-wider block mt-1.5 bg-gold/10 border border-gold/25 px-2.5 py-0.5 rounded-[1px] w-fit">
+                    {selectedStudent.role}
+                  </span>
+                ) : (
+                  <span className="font-syne-mono text-[8px] text-muted tracking-widest uppercase block mt-1.5">
+                    ANGGOTA KELAS XII.A5
+                  </span>
+                )}
+              </div>
+
+              {/* Quote Section */}
+              <div className="relative py-4 px-5 bg-[var(--bg-warm)] border-l-2 border-gold rounded-r-[1px] mt-2">
+                <Quote size={16} className="text-gold/40 absolute top-2.5 left-2.5 pointer-events-none" />
+                <p className="font-instrument italic text-base text-dark-maroon leading-relaxed pl-4 pt-1">
+                  &ldquo;{selectedStudent.quote || 'Tercatat pada database akademik kelas XII.A5 periode ajaran ini.'}&rdquo;
+                </p>
+              </div>
+            </div>
+
+            {/* Bottom ledger details */}
+            <div className="border-t border-gold/10 pt-4 mt-6 flex justify-between items-center text-[8px] font-syne-mono text-muted/60 uppercase tracking-widest">
+              <span>MEMOIR DIARY</span>
+              <span>XII.A5 RECORD</span>
+            </div>
+          </div>
+        </div>
+      )}
 
     </section>
   );

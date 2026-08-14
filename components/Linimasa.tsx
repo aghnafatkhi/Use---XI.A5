@@ -144,7 +144,7 @@ export default function Linimasa() {
           <div className="flex flex-col space-y-5 lg:space-y-6 items-center sm:items-start w-full max-w-[320px] mx-auto sm:max-w-none">
              
              {/* Note 1 */}
-             <div className="w-full sm:w-[260px] bg-cream/70 dark:bg-maroon/20 p-5 sm:p-6 rounded-[2px] shadow-[4px_4px_0px_rgba(255,215,0,0.2)] dark:shadow-[4px_4px_0px_rgba(0,0,0,0.5)] -rotate-[1.5deg] relative sr-up delay-3 border border-gold/20 transition-transform hover:rotate-0 hover:-translate-y-1">
+             <div className="w-full sm:w-[260px] bg-cream/70 dark:bg-maroon/20 p-5 sm:p-6 rounded-[2px] shadow-[4px_4px_0px_rgba(255,215,0,0.2)] dark:shadow-[4px_4px_0px_rgba(0,0,0,0.5)] md:-rotate-[1.5deg] rotate-0 relative sr-up delay-3 border border-gold/20 transition-transform md:hover:rotate-0 hover:-translate-y-1">
                <div className="absolute top-3 left-1/2 -translate-x-1/2 w-2 h-2 bg-gold rounded-full shadow-sm"></div>
                <p className="font-syne-mono text-gold font-bold uppercase tracking-widest mb-2 mt-2 text-[0.65rem] border-b border-gold/20 pb-1 inline-block">Surat Edaran #01</p>
                <p className="font-syne text-[0.85rem] text-dark-maroon dark:text-cream leading-[1.6]">
@@ -153,13 +153,13 @@ export default function Linimasa() {
              </div>
  
              {/* Note 2 */}
-             <div className="w-full sm:w-[260px] bg-cream/70 dark:bg-maroon/20 p-5 sm:p-6 rounded-[2px] shadow-[4px_4px_0px_rgba(255,215,0,0.2)] dark:shadow-[4px_4px_0px_rgba(0,0,0,0.5)] rotate-[1.5deg] relative sm:ml-6 lg:ml-8 sr-up delay-4 border border-gold/20 transition-transform hover:rotate-0 hover:-translate-y-1">
+             <div className="w-full sm:w-[260px] bg-cream/70 dark:bg-maroon/20 p-5 sm:p-6 rounded-[2px] shadow-[4px_4px_0px_rgba(255,215,0,0.2)] dark:shadow-[4px_4px_0px_rgba(0,0,0,0.5)] md:rotate-[1.5deg] rotate-0 relative sm:ml-6 lg:ml-8 sr-up delay-4 border border-gold/20 transition-transform md:hover:rotate-0 hover:-translate-y-1">
                <div className="absolute top-3 left-1/2 -translate-x-1/2 w-3 h-3 bg-gold/40 rounded-full flex items-center justify-center">
                  <div className="w-1.5 h-1.5 bg-gold rounded-full"></div>
                </div>
                <p className="font-syne-mono text-gold font-bold uppercase tracking-widest mb-2 mt-2 text-[0.65rem] border-b border-gold/20 pb-1 inline-block">Edaran Tugas</p>
                <p className="font-syne text-[0.85rem] text-dark-maroon dark:text-cream leading-[1.6]">
-                 Batas waktu seluruh pengumpulan laporan tugas PJOK adalah hari Jumat sebelum pukul 14.00 WIB.
+                 Batas waktu seluruh pengumpulan laporan tugas Bahasa Indonesia adalah hari Jumat sebelum pukul 14.00 WIB.
                </p>
              </div>
 

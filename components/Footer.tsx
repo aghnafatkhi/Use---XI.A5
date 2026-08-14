@@ -21,25 +21,26 @@ export default function Footer() {
     <footer className="bg-dark-maroon relative">
       <div className="w-full h-[1px] bg-gold/20"></div>
 
-      <div className="pt-20 pb-10 px-6 md:px-[8vw] max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-16 md:gap-8">
+      <div className="pt-10 pb-8 px-6 md:px-[8vw] max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-10 md:gap-8">
         
         {/* LEFT */}
-        <div className="relative md:w-1/3">
+        <div className="relative md:w-1/4">
           <div className="absolute -left-4 -top-8 font-instrument text-[64px] text-gold/15 leading-none select-none pointer-events-none z-0">
             ε
           </div>
           <div className="relative z-10 flex flex-col">
-            <span className="font-satisfy text-[1.8rem] text-white mb-2">Epsilonscience</span>
-            <span className="font-syne-mono text-[0.7rem] text-white/40 tracking-[0.1em] uppercase">
-              XII.A5 · SMAN 1 Cileungsi · 2026/2027
+            <span className="font-satisfy text-[1.6rem] text-white mb-1">Epsilonscience</span>
+            <span className="font-syne-mono text-[0.65rem] text-white/40 tracking-[0.1em] uppercase">
+              XII.A5 · SMAN 1 Cileungsi
             </span>
           </div>
         </div>
 
-        {/* CENTER */}
-        <div className="md:w-1/3 flex flex-col md:items-center">
-          <div>
-            <span className="block font-syne font-extrabold text-[9px] text-gold/60 tracking-[0.2em] uppercase mb-4">
+        {/* RIGHT LINKS GRID */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-8 md:flex md:flex-row md:justify-end md:gap-16 flex-grow">
+          {/* CENTER */}
+          <div className="flex flex-col">
+            <span className="block font-syne font-extrabold text-[9px] text-gold/60 tracking-[0.2em] uppercase mb-3">
               Navigasi
             </span>
             <div className="flex flex-col space-y-1">
@@ -47,27 +48,25 @@ export default function Footer() {
                 <a 
                   key={item} 
                   href={`#${item.toLowerCase()}`}
-                  className="font-syne text-[0.8rem] text-white/50 hover:text-gold leading-[2.2] transition-colors focus-visible:outline-2 focus-visible:outline-gold"
+                  className="font-syne text-[0.75rem] text-white/50 hover:text-gold leading-[2] transition-colors focus-visible:outline-2 focus-visible:outline-gold"
                 >
                   {item}
                 </a>
               ))}
             </div>
           </div>
-        </div>
 
-        {/* RIGHT */}
-        <div className="md:w-1/3 flex flex-col md:items-end">
-          <div className="flex flex-col mb-8 md:items-end">
-            <span className="block font-syne font-extrabold text-[9px] text-gold/60 tracking-[0.2em] uppercase mb-4 md:text-right">
+          {/* RIGHT */}
+          <div className="flex flex-col">
+            <span className="block font-syne font-extrabold text-[9px] text-gold/60 tracking-[0.2em] uppercase mb-3">
               Media Sosial
             </span>
-            <div className="flex flex-col space-y-1 md:text-right">
+            <div className="flex flex-col space-y-1">
               <a 
                 href="https://www.youtube.com/@epsilonsciencee" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="font-syne text-[0.8rem] text-white/50 hover:text-gold leading-[2] transition-colors"
+                className="font-syne text-[0.75rem] text-white/50 hover:text-gold leading-[2] transition-colors"
               >
                 YouTube
               </a>
@@ -75,7 +74,7 @@ export default function Footer() {
                 href="https://www.instagram.com/epsilonscience5" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="font-syne text-[0.8rem] text-white/50 hover:text-gold leading-[2] transition-colors"
+                className="font-syne text-[0.75rem] text-white/50 hover:text-gold leading-[2] transition-colors"
               >
                 Instagram
               </a>
@@ -83,21 +82,23 @@ export default function Footer() {
                 href="https://www.tiktok.com/@epsil0nsciencee" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="font-syne text-[0.8rem] text-white/50 hover:text-gold leading-[2] transition-colors"
+                className="font-syne text-[0.75rem] text-white/50 hover:text-gold leading-[2] transition-colors"
               >
                 TikTok
               </a>
             </div>
           </div>
-          <div className="flex flex-col">
-            <span className="block font-syne font-extrabold text-[9px] text-gold/60 tracking-[0.2em] uppercase mb-4 md:text-right">
+
+          {/* KELAS */}
+          <div className="flex flex-col col-span-2 sm:col-span-1">
+            <span className="block font-syne font-extrabold text-[9px] text-gold/60 tracking-[0.2em] uppercase mb-3">
               Kelas Kami
             </span>
-            <div className="flex flex-col space-y-1 md:text-right">
-              <span className="font-syne text-[0.8rem] text-white/50 leading-[2]">Wali Kelas: Franti Surya</span>
-              <span className="font-syne text-[0.8rem] text-white/50 leading-[2]">Sekolah: SMAN 1 Cileungsi</span>
-              <span className="font-syne text-[0.8rem] text-white/50 leading-[2]">Tahun Ajaran: 2026/2027</span>
-              <span className="font-syne text-[0.8rem] text-white/50 leading-[2]">Jumlah Siswa: 36 orang</span>
+            <div className="flex flex-col space-y-1">
+              <span className="font-syne text-[0.75rem] text-white/50 leading-[2]">Wali Kelas: Franti Surya</span>
+              <span className="font-syne text-[0.75rem] text-white/50 leading-[2]">Sekolah: SMAN 1 Cileungsi</span>
+              <span className="font-syne text-[0.75rem] text-white/50 leading-[2]">Tahun Ajaran: 2026/2027</span>
+              <span className="font-syne text-[0.75rem] text-white/50 leading-[2]">Jumlah Siswa: 36 orang</span>
             </div>
           </div>
         </div>
